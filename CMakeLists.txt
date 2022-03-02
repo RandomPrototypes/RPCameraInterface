@@ -9,9 +9,21 @@ option(USE_QT "Use QT" OFF)
 option(USE_OPENCV "Use OpenCV" OFF)
 option(BUILD_DEMO "Build DEMO" OFF)
 
-SET(FFMPEG_DIR C:/ffmpeg5.0 CACHE STRING "ffmpeg dir")
-include_directories(${FFMPEG_DIR}/include)
-link_directories(${FFMPEG_DIR}/lib)
+if(WIN32)
+   SET(FFMPEG_DIR "" CACHE STRING "ffmpeg dir")
+   SET(FFMPEG_INCLUDE_DIR "" CACHE STRING "ffmpeg include dir")
+   SET(FFMPEG_LIB_DIR "" CACHE STRING "ffmpeg lib dir")
+   if(FFMPEG_DIR AND (NOT FFMPEG_INCLUDE_DIR))
+      set(FFMPEG_INCLUDE_DIR ${FFMPEG_DIR}/include CACHE STRING "ffmpeg include dir" FORCE)
+   endif()
+   if(FFMPEG_DIR AND (NOT FFMPEG_LIB_DIR))
+      set(FFMPEG_LIB_DIR ${FFMPEG_DIR}/lib CACHE STRING "ffmpeg lib dir" FORCE)
+   endif()
+   include_directories(${FFMPEG_INCLUDE_DIR})
+   link_directories(${FFMPEG_LIB_DIR})
+else()
+   find_package(ffmpeg REQUIRED)
+endif()
 
 set(LIB_SRC
 	src/CameraInterface.cpp
@@ -39,7 +51,7 @@ if(${USE_QT})
 endif()
 
 if(${USE_OPENCV})
-    find_package(OpenCV REQUIRED HINTS C:/opencv-4.5.5/release/install/x64/mingw/lib)
+    find_package(OpenCV REQUIRED)
     set(LIB_SRC
 	${LIB_SRC}
 	src/CameraInterfaceOpenCV.cpp
