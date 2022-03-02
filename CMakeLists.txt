@@ -22,7 +22,16 @@ if(WIN32)
    include_directories(${FFMPEG_INCLUDE_DIR})
    link_directories(${FFMPEG_LIB_DIR})
 else()
-   find_package(ffmpeg REQUIRED)
+   find_package(PkgConfig REQUIRED)
+   pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
+        libavdevice
+        libavfilter
+        libavformat
+        libavcodec
+        libswresample
+        libswscale
+        libavutil
+   )
 endif()
 
 set(LIB_SRC
