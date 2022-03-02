@@ -28,7 +28,7 @@ public:
 
 
     SwsContext *swsContext = nullptr;
-    AVCodec *codec = nullptr;
+    const AVCodec *codec = nullptr;
     AVCodecContext *codecContext = nullptr;
     AVPacket *pkt  = nullptr;
     AVFrame *frame = nullptr;

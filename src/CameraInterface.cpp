@@ -1,6 +1,6 @@
 #include "CameraInterface.h"
 #include <sstream>
-#include <qdebug.h>
+#include <chrono>
 
 namespace RPCameraInterface
 {
@@ -19,14 +19,36 @@ std::string toString(ImageType type)
     {
         case ImageType::UNKNOWN:
             return "unknown";
+        case ImageType::GRAY8:
+            return "GRAY8";
+        case ImageType::RGB24:
+            return "RGB24";
+        case ImageType::BGR24:
+            return "BGR24";
+        case ImageType::BGRA32:
+            return "BGRA32";
+        case ImageType::RGB555:
+            return "RGB555";
+        case ImageType::RGB565:
+            return "RGB565";
+        case ImageType::AYUV:
+            return "AYUV";
+        case ImageType::YUV420P:
+            return "YUV420P";
+        case ImageType::UYVY:
+            return "UYVY";
+        case ImageType::Y211:
+            return "Y211";
+        case ImageType::Y41P:
+            return "Y41P";
         case ImageType::YUYV422:
-            return "yuyv422";
-        case ImageType::RGB:
-            return "rgb";
-        case ImageType::BGR:
-            return "bgr";
-        case ImageType::MJPG:
-            return "mjpg";
+            return "YUYV422";
+        case ImageType::YVU9:
+            return "YVU9";
+        case ImageType::YVYU:
+            return "YVYU";
+        case ImageType::JPG:
+            return "JPG";
         default:
             return "unknown";
     }

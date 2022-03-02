@@ -9,10 +9,23 @@ namespace RPCameraInterface
 enum class ImageType
 {
     UNKNOWN,
-    RGB,
-    BGR,
+    GRAY8,
+    RGB24,
+    BGR24,
+    BGRA32,
+    RGB555,
+    RGB565,
+    AYUV,
+    YUV420P,
+    UYVY,
+    Y211,
+    Y41P,
     YUYV422,
-    MJPG,
+    YVU9,
+    YVYU,
+    BY8,
+    Y16,
+    JPG,
     NB_FORMAT_TYPE
 };
 
@@ -39,6 +52,7 @@ public:
     ImageType type;
 
     ImageFormat();
+    ImageFormat(ImageType type, int width, int height, int fps = 0);
 
     std::string toString();
 };

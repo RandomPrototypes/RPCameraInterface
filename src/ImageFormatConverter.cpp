@@ -3,15 +3,50 @@
 namespace RPCameraInterface
 {
 
+//https://github.com/FFmpeg/FFmpeg/blob/master/libavcodec/raw.c
 AVPixelFormat ImageTypeToAVPixelFormat(ImageType type)
 {
-    if(type == ImageType::RGB)
-        return AV_PIX_FMT_RGB24;
-    else if(type == ImageType::BGR)
-        return AV_PIX_FMT_BGR24;
-    else if(type == ImageType::YUYV422)
-        return AV_PIX_FMT_YUYV422;
-    else return AV_PIX_FMT_NONE;
+    switch(type)
+    {
+        case ImageType::UNKNOWN:
+            return AV_PIX_FMT_NONE;
+        case ImageType::GRAY8:
+            return AV_PIX_FMT_GRAY8;
+        case ImageType::RGB24:
+            return AV_PIX_FMT_RGB24;
+        case ImageType::BGR24:
+            return AV_PIX_FMT_BGR24;
+        case ImageType::BGRA32:
+            return AV_PIX_FMT_BGRA;
+        case ImageType::RGB555:
+            return AV_PIX_FMT_RGB555BE;//todo : check if correct
+        case ImageType::RGB565:
+            return AV_PIX_FMT_RGB565BE;//todo : check if correct
+        case ImageType::AYUV:
+            return AV_PIX_FMT_NONE;//todo : it seems it does not exist in ffmpeg
+        case ImageType::YUV420P:
+            return AV_PIX_FMT_YUV420P;
+        case ImageType::UYVY:
+            return AV_PIX_FMT_UYVY422;
+        case ImageType::Y211:
+            return AV_PIX_FMT_NONE;//todo : it seems it does not exist in ffmpeg
+        case ImageType::Y41P:
+            return AV_PIX_FMT_YUV411P;//todo : check if correct
+        case ImageType::YUYV422:
+            return AV_PIX_FMT_YUYV422;
+        case ImageType::YVU9:
+            return AV_PIX_FMT_YUV410P;
+        case ImageType::YVYU:
+            return AV_PIX_FMT_YVYU422;
+        case ImageType::BY8:
+            return AV_PIX_FMT_NONE;
+        case ImageType::Y16:
+            return AV_PIX_FMT_NONE;
+        case ImageType::JPG:
+            return AV_PIX_FMT_NONE;
+        default:
+            return AV_PIX_FMT_NONE;
+    }
 }
 
 
@@ -34,12 +69,12 @@ void ImageFormatConverter::init(ImageFormat srcFormat, ImageFormat dstFormat)
     srcPixelFormat = ImageTypeToAVPixelFormat(srcFormat.type);
     dstPixelFormat = ImageTypeToAVPixelFormat(dstFormat.type);
     //https://stackoverflow.com/questions/23443322/decoding-mjpeg-with-libavcodec
-    if(srcFormat.type == ImageType::MJPG)
+    if(srcFormat.type == ImageType::JPG)
     {
         srcPixelFormat = AV_PIX_FMT_BGR24;//AV_PIX_FMT_YUVJ422P;
         codec = avcodec_find_decoder(AV_CODEC_ID_MJPEG);
         codecContext = avcodec_alloc_context3(codec);
-        avcodec_get_context_defaults3(codecContext, codec);
+        //avcodec_get_context_defaults3(codecContext, codec);
         avcodec_open2(codecContext, codec, nullptr);
 
         pkt = av_packet_alloc();
@@ -101,7 +136,7 @@ bool ImageFormatConverter::convertImage(const std::shared_ptr<ImageData>& srcImg
     dstImg->imageFormat = dstFormat;
     dstImg->timestamp = srcImg->timestamp;
 
-    if(srcFormat.type == ImageType::MJPG)
+    if(srcFormat.type == ImageType::JPG)
     {
         pkt->size = srcImg->dataSize;
         pkt->data = srcImg->data;

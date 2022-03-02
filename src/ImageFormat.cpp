@@ -13,6 +13,12 @@ ImageFormat::ImageFormat()
     fps = 0;
 }
 
+ImageFormat::ImageFormat(ImageType type, int width, int height, int fps)
+    :type(type), width(width), height(height), fps(fps)
+{
+
+}
+
 std::string ImageFormat::toString()
 {
     std::ostringstream str;
