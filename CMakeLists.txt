@@ -7,6 +7,7 @@ include(CheckIncludeFiles)
 
 option(USE_QT "Use QT" OFF)
 option(USE_OPENCV "Use OpenCV" OFF)
+option(BUILD_DEMO "Build DEMO" OFF)
 
 SET(FFMPEG_DIR C:/ffmpeg5.0 CACHE STRING "ffmpeg dir")
 include_directories(${FFMPEG_DIR}/include)
@@ -20,10 +21,10 @@ set(LIB_SRC
 )
 
 set(LIB_INCLUDE
-	include/CameraInterface.h
-	include/ImageData.h
-	include/ImageFormat.h
-	include/ImageFormatConverter.h
+	include/RPCameraInterface/CameraInterface.h
+	include/RPCameraInterface/ImageData.h
+	include/RPCameraInterface/ImageFormat.h
+	include/RPCameraInterface/ImageFormatConverter.h
 )
 
 if(${USE_QT})
@@ -33,7 +34,7 @@ if(${USE_QT})
     )
     set(LIB_INCLUDE
 	${LIB_INCLUDE}
-	include/CameraEnumeratorQt.h
+	include/RPCameraInterface/CameraEnumeratorQt.h
     )
 endif()
 
@@ -45,7 +46,7 @@ if(${USE_OPENCV})
     )
     set(LIB_INCLUDE
 	${LIB_INCLUDE}
-	include/CameraInterfaceOpenCV.h
+	include/RPCameraInterface/CameraInterfaceOpenCV.h
     )
 endif()
 
@@ -60,7 +61,7 @@ if(HAVE_DSHOW)
     )
     set(LIB_INCLUDE
 	${LIB_INCLUDE}
-	include/CameraInterfaceDShow.h
+	include/RPCameraInterface/CameraInterfaceDShow.h
 	src/cap_dshow/cap_dshow.hpp
     )
 else()
@@ -70,7 +71,9 @@ endif()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_library(RPCameraInterface STATIC ${LIB_SRC} ${LIB_INCLUDE})
-add_executable(RPCameraInterfaceDemo ${LIB_INCLUDE} demo/main.cpp)
+if(BUILD_DEMO)
+   add_executable(RPCameraInterfaceDemo ${LIB_INCLUDE} demo/main.cpp)
+endif()
 
 if(HAVE_DSHOW)
    target_compile_definitions(RPCameraInterface PUBLIC "HAVE_DSHOW")
@@ -85,11 +88,14 @@ target_link_libraries(RPCameraInterface PRIVATE
         libswscale
         libavutil)
 if(${USE_OPENCV})
-	target_link_libraries(RPCameraInterface PRIVATE ${OpenCV_LIBS})
-	target_link_libraries(RPCameraInterfaceDemo PRIVATE ${OpenCV_LIBS})
+   target_link_libraries(RPCameraInterface PRIVATE ${OpenCV_LIBS})
 endif()
 
-target_link_libraries(RPCameraInterfaceDemo LINK_PUBLIC RPCameraInterface)
+if(BUILD_DEMO)
+   target_link_libraries(RPCameraInterfaceDemo PRIVATE ${OpenCV_LIBS})
+   target_link_libraries(RPCameraInterfaceDemo LINK_PUBLIC RPCameraInterface)
+endif()
 
-
-install(FILES include/*.h DESTINATION include/RPCameraInterface)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include DESTINATION . PATTERN "*.h")
+install(TARGETS RPCameraInterface DESTINATION lib/ EXPORT RPCameraInterface-config)
+install(EXPORT RPCameraInterface-config DESTINATION lib/cmake/RPCameraInterface)

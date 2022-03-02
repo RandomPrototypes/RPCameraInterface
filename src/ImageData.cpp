@@ -1,4 +1,4 @@
-#include "ImageData.h"
+#include <RPCameraInterface/ImageData.h>
 
 namespace RPCameraInterface
 {

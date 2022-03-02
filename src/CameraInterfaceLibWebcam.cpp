@@ -1,4 +1,4 @@
-#include "CameraInterfaceLibWebcam.h"
+#include <RPCameraInterface/CameraInterfaceLibWebcam.h>
 #include <libwebcam/webcam.h>
 #include <QDebug>
 

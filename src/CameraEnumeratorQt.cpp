@@ -1,4 +1,4 @@
-#include "CameraEnumeratorQt.h"
+#include <RPCameraInterface/CameraEnumeratorQt.h>
 #include <QCameraDevice>
 #include <QMediaDevices>
 

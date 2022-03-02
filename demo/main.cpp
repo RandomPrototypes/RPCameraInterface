@@ -1,6 +1,6 @@
-#include "CameraInterface.h"
-#include "ImageFormatConverter.h"
-#include "CameraInterfaceDShow.h"
+#include <RPCameraInterface/CameraInterface.h>
+#include <RPCameraInterface/ImageFormatConverter.h>
+#include <RPCameraInterface/CameraInterfaceDShow.h>
 #include <opencv2/opencv.hpp>
 
 using namespace RPCameraInterface;

@@ -1,4 +1,4 @@
-#include "CameraInterface.h"
+#include <RPCameraInterface/CameraInterface.h>
 #include <sstream>
 #include <chrono>
 

@@ -1,4 +1,4 @@
-#include "ImageFormat.h"
+#include <RPCameraInterface/ImageFormat.h>
 #include <sstream>
 
 

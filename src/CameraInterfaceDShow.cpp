@@ -1,4 +1,4 @@
-#include "CameraInterfaceDShow.h"
+#include <RPCameraInterface/CameraInterfaceDShow.h>
 #include "cap_dshow/cap_dshow.hpp"
 
 namespace RPCameraInterface

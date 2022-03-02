@@ -1,4 +1,4 @@
-#include "CameraInterfaceAndroid.h"
+#include <RPCameraInterface/CameraInterfaceAndroid.h>
 #include <QDebug>
 
 namespace RPCameraInterface

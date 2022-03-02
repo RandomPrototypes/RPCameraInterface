@@ -1,4 +1,4 @@
-#include "ImageFormatConverter.h"
+#include <RPCameraInterface/ImageFormatConverter.h>
 
 namespace RPCameraInterface
 {

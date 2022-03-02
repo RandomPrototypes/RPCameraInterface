@@ -1,4 +1,4 @@
-#include "CameraInterfaceOpenCV.h"
+#include <RPCameraInterface/CameraInterfaceOpenCV.h>
 #include <opencv2/opencv.hpp>
 
 namespace RPCameraInterface
