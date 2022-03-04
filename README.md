@@ -11,3 +11,8 @@ Similar to OpenCV camera interface but with a few differences :
 * Easy formats conversion based on ffmpeg
 * Support on-device recording with preview (only for Android phones currently, but plan to add Raspberry pi, Oak-D,... later)
 
+### License
+Apache 2
+
+### Credits
+The DShow backend is based on OpenCV backend and a few functions from libwebcam
