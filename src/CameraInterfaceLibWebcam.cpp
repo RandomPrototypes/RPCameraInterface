@@ -6,6 +6,7 @@ namespace RPCameraInterface
 {
 
 CameraEnumeratorLibWebcam::CameraEnumeratorLibWebcam()
+    :CameraEnumerator(CaptureBackend::LibWebcam)
 {
     cameraType = "USB camera";
 }

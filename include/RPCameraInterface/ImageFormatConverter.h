@@ -4,6 +4,7 @@
 #include <memory>
 #include "ImageFormat.h"
 #include "ImageData.h"
+#include "RPCameraInterfaceDefs.h"
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -16,7 +17,7 @@ extern "C" {
 namespace RPCameraInterface
 {
 
-class ImageFormatConverter
+class RP_EXPORTS ImageFormatConverter
 {
 public:
     ImageFormatConverter(ImageFormat srcFormat, ImageFormat dstFormat);
@@ -41,7 +42,7 @@ public:
     AVPixelFormat srcPixelFormat, dstPixelFormat;
 };
 
-AVPixelFormat ImageTypeToAVPixelFormat(ImageType type);
+AVPixelFormat RP_EXPORTS ImageTypeToAVPixelFormat(ImageType type);
 
 }
 

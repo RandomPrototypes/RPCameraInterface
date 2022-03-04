@@ -5,6 +5,7 @@ namespace RPCameraInterface
 {
 
 CameraInterfaceOpenCV::CameraInterfaceOpenCV()
+    :CameraInterface(CaptureBackend::OpenCV)
 {
     cap = NULL;
 }

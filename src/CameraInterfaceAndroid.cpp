@@ -1,5 +1,5 @@
 #include <RPCameraInterface/CameraInterfaceAndroid.h>
-#include <QDebug>
+//#include <QDebug>
 
 namespace RPCameraInterface
 {
@@ -15,6 +15,7 @@ enum AndroidCameraCmd
 };
 
 CameraEnumeratorAndroid::CameraEnumeratorAndroid()
+    :CameraEnumerator(CaptureBackend::RPNetworkCamera)
 {
     cameraType = "Android phone";
     listRequiredField.push_back(CameraEnumeratorField("ip_address", "text", "ip address", "192.168."));
@@ -43,7 +44,7 @@ std::vector<std::string> splitString(const char* str, int length, char delim)
 
 bool CameraEnumeratorAndroid::detectCameras()
 {
-    qDebug() << "detectCameras";
+    //qDebug() << "detectCameras";
     listCameras.clear();
     BufferedSocket bufferedSock;
     std::string ip_address = listRequiredField[0].value;
@@ -52,18 +53,18 @@ bool CameraEnumeratorAndroid::detectCameras()
     {
         return false;
     }
-    qDebug() << "connected";
+    //qDebug() << "connected";
     bufferedSock.sendInt32(AndroidCameraCmd::LIST_CAMERAS);
     bufferedSock.sendInt64(0);
     int ret = bufferedSock.readInt32();
     if(ret != AndroidCameraCmd::LIST_CAMERAS)
     {
-        qDebug() << "bad reply";
+        //qDebug() << "bad reply";
         bufferedSock.disconnect();
         return false;
     }
     int nbCameras = bufferedSock.readInt32();
-    qDebug() << "nbCameras : " << nbCameras;
+    //qDebug() << "nbCameras : " << nbCameras;
     for(int i = 0; i < nbCameras; i++)
     {
         CameraInfo camInfo;
@@ -80,7 +81,7 @@ bool CameraEnumeratorAndroid::detectCameras()
             else if(line.rfind("desc:", 0) == 0)
                 camInfo.description = line.substr(5);
         }
-        qDebug() << camInfo.id.c_str();
+        //qDebug() << camInfo.id.c_str();
         listCameras.push_back(camInfo);
         delete [] data;
     }
@@ -94,6 +95,7 @@ bool CameraEnumeratorAndroid::detectCameras()
 
 
 CameraInterfaceAndroid::CameraInterfaceAndroid()
+    :CameraInterface(CaptureBackend::RPNetworkCamera)
 {
 }
 
@@ -103,13 +105,13 @@ CameraInterfaceAndroid::~CameraInterfaceAndroid()
 
 bool CameraInterfaceAndroid::open(std::string params)
 {
-    qDebug() << "CameraInterfaceAndroid::open(\"" << params.c_str() << "\")";
+    //qDebug() << "CameraInterfaceAndroid::open(\"" << params.c_str() << "\")";
     std::vector<std::string> list_params = splitString(params.c_str(), params.length(), ':');
     if(!bufferedSock.connect(list_params[0], std::stoi(list_params[1])))
     {
         return false;
     }
-    qDebug() << "connection successful";
+    //qDebug() << "connection successful";
     if(!syncTimestamp())
         return false;
     selectVideoCodec(VideoCodecType::H264);
@@ -133,7 +135,7 @@ std::vector<ImageFormat> CameraInterfaceAndroid::getAvailableFormats()
     listFormats[2].width = 1920;
     listFormats[2].height = 1080;*/
     for(int i = 0; i < listFormats.size(); i++)
-        listFormats[i].type = ImageType::MJPG;
+        listFormats[i].type = ImageType::JPG;
     return listFormats;
 }
 
@@ -174,7 +176,7 @@ std::shared_ptr<ImageData> CameraInterfaceAndroid::getNewFrame(bool skipOldFrame
     packet.putInt32(imageFormat.width);
     packet.putInt32(imageFormat.height);
     std::string format = "";
-    if(imageFormat.type == ImageType::MJPG)
+    if(imageFormat.type == ImageType::JPG)
         format = "MJPG";
     packet.putInt32(format.size());
     packet.putNBytes(format.c_str(), format.size());
@@ -183,7 +185,7 @@ std::shared_ptr<ImageData> CameraInterfaceAndroid::getNewFrame(bool skipOldFrame
 
     if(bufferedSock.readInt32() != CAPTURE_IMG)
     {
-        qDebug() << "protocol error";
+        //qDebug() << "protocol error";
         errorMsg = "protocol error\n";
         return std::shared_ptr<ImageData>();
     }
@@ -192,13 +194,13 @@ std::shared_ptr<ImageData> CameraInterfaceAndroid::getNewFrame(bool skipOldFrame
     int64_t timestamp = bufferedSock.readInt64();
     int64_t size = bufferedSock.readInt64();
     std::shared_ptr<ImageData> img = std::make_shared<ImageData>();
-    img->imageFormat.type = ImageType::MJPG;
+    img->imageFormat.type = ImageType::JPG;
     img->imageFormat.width = imageFormat.width;
     img->imageFormat.height = imageFormat.height;
     img->timestamp = timestamp + timestampOffsetMs;
     img->allocData(size);
     bufferedSock.readNBytes((char*)img->data, size);
-    qDebug() << "new frame, id : " << frame_id << "timestamp : " << img->timestamp;
+    //qDebug() << "new frame, id : " << frame_id << "timestamp : " << img->timestamp;
     return img;
 }
 std::string CameraInterfaceAndroid::getErrorMsg()
@@ -226,7 +228,7 @@ bool CameraInterfaceAndroid::startRecording()
     bufferedSock.sendInt64(0);
     if(bufferedSock.readInt32() != START_RECORDING)
     {
-        qDebug() << "protocol error";
+        //qDebug() << "protocol error";
         errorMsg = "protocol error\n";
         return false;
     }
@@ -238,14 +240,14 @@ bool CameraInterfaceAndroid::stopRecordingAndSaveToFile(std::string videoFilenam
     bufferedSock.sendInt64(0);
     if(bufferedSock.readInt32() != STOP_RECORDING)
     {
-        qDebug() << "protocol error";
+        //qDebug() << "protocol error";
         errorMsg = "protocol error\n";
         return false;
     }
     int64_t startRecordTimestamp = bufferedSock.readInt64();
     int64_t size = bufferedSock.readInt64();
 
-    qDebug() << "writing to file...";
+    //qDebug() << "writing to file...";
     FILE *timestampFile = fopen(timestampFilename.c_str(), "w");
     fprintf(timestampFile, "%ld\n", startRecordTimestamp);
     fclose(timestampFile);
@@ -264,12 +266,12 @@ bool CameraInterfaceAndroid::stopRecordingAndSaveToFile(std::string videoFilenam
     }
     if(!file)
     {
-        qDebug() << "can not open file: " << videoFilename.c_str();
+        //qDebug() << "can not open file: " << videoFilename.c_str();
         errorMsg = "can not open file: "+videoFilename;
         return false;
     }
     fclose(file);
-    qDebug() << "Done";
+    //qDebug() << "Done";
     return true;
 }
 
@@ -280,15 +282,15 @@ bool CameraInterfaceAndroid::syncTimestamp()
     uint64_t startTimestamp = getTimestampMs();
     if(bufferedSock.readInt32() != TIMESTAMP)
     {
-        qDebug() << "protocol error";
+        //qDebug() << "protocol error";
         errorMsg = "protocol error\n";
         return false;
     }
     uint64_t endTimestamp = getTimestampMs();
     int64_t androidTimestampMs = bufferedSock.readInt64();
-    qDebug() << "roundtrip time : " << (endTimestamp - startTimestamp) << "ms";
+    //qDebug() << "roundtrip time : " << (endTimestamp - startTimestamp) << "ms";
     timestampOffsetMs = ((int64_t)(startTimestamp+endTimestamp)/2) - androidTimestampMs;
-    qDebug() << "offset : " << timestampOffsetMs << "ms";
+    //qDebug() << "offset : " << timestampOffsetMs << "ms";
     return true;
 }
 

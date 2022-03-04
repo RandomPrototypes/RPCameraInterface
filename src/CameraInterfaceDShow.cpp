@@ -24,6 +24,7 @@ videoInput& DShowVideoInput::getVideoInput()
 }
 
 CameraEnumeratorDShow::CameraEnumeratorDShow()
+    :CameraEnumerator(CaptureBackend::DShow)
 {
     cameraType = "USB camera";
 }
@@ -49,6 +50,7 @@ bool CameraEnumeratorDShow::detectCameras()
 }
 
 CameraInterfaceDShow::CameraInterfaceDShow()
+    :CameraInterface(CaptureBackend::DShow)
 {
     cameraId = -1;
 }

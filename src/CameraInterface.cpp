@@ -2,10 +2,13 @@
 #include <sstream>
 #include <chrono>
 
+#include "RPCameraInterface/CameraInterfaceAndroid.h"
+#ifdef HAVE_DSHOW
+#include "RPCameraInterface/CameraInterfaceDShow.h"
+#endif
+
 namespace RPCameraInterface
 {
-
-CameraMngr* CameraMngr::instance = NULL;
 
 uint64_t getTimestampMs()
 {
@@ -54,7 +57,8 @@ std::string toString(ImageType type)
     }
 }
 
-CameraInterface::CameraInterface()
+CameraInterface::CameraInterface(CaptureBackend backend)
+    :backend(backend)
 {
 
 }
@@ -148,7 +152,8 @@ CameraEnumeratorField::CameraEnumeratorField(std::string name, std::string type,
 
 }
 
-CameraEnumerator::CameraEnumerator()
+CameraEnumerator::CameraEnumerator(CaptureBackend backend)
+    :backend(backend)
 {
 }
 
@@ -211,30 +216,44 @@ CameraEnumAndFactory::CameraEnumAndFactory(CameraEnumerator* enumerator, CameraI
 
 }
 
-CameraMngr::CameraMngr()
+RP_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends()
 {
+    std::vector<CaptureBackend> list;
+    list.push_back(CaptureBackend::RPNetworkCamera);
+    #ifdef HAVE_DSHOW
+    list.push_back(CaptureBackend::DShow);
+    #endif
 
+
+    return list;
 }
-
-CameraMngr::~CameraMngr()
+RP_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend backend)
 {
-    for(size_t i = 0; i < listCameraEnumAndFactory.size(); i++)
+    switch(backend)
     {
-        delete listCameraEnumAndFactory[i].enumerator;
-        delete listCameraEnumAndFactory[i].interfaceFactory;
+        case CaptureBackend::RPNetworkCamera:
+            return std::make_shared<CameraEnumeratorAndroid>();
+        #ifdef HAVE_DSHOW
+        case CaptureBackend::DShow:
+            return std::make_shared<CameraEnumeratorDShow>();
+        #endif
     }
-}
 
-void CameraMngr::registerEnumAndFactory(CameraEnumerator* enumerator, CameraInterfaceFactory* factory)
-{
-    listCameraEnumAndFactory.push_back(CameraEnumAndFactory(enumerator, factory));
+    return std::shared_ptr<CameraEnumerator>();
 }
-
-CameraMngr *CameraMngr::getInstance()
+RP_EXPORTS std::shared_ptr<CameraInterface> getCameraInterface(CaptureBackend backend)
 {
-    if(instance == NULL)
-        instance = new CameraMngr();
-    return instance;
+    switch(backend)
+    {
+        case CaptureBackend::RPNetworkCamera:
+            return std::make_shared<CameraInterfaceAndroid>();
+        #ifdef HAVE_DSHOW
+        case CaptureBackend::DShow:
+            return std::make_shared<CameraInterfaceDShow>();
+        #endif
+    }
+
+    return std::shared_ptr<CameraInterface>();
 }
 
 }

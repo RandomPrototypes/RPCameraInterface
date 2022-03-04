@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 
+#include "RPCameraInterfaceDefs.h"
 #include "ImageFormat.h"
 #include "ImageData.h"
 
@@ -13,7 +14,17 @@ namespace RPCameraInterface
 
 uint64_t getTimestampMs();
 
-class CameraInfo
+enum class CaptureBackend
+{
+    Any,
+    RPNetworkCamera,
+    DShow,
+    V4L2,
+    LibWebcam,
+    OpenCV,
+};
+
+class RP_EXPORTS CameraInfo
 {
 public:
     std::string id;
@@ -21,7 +32,7 @@ public:
     std::string description;
 };
 
-class CameraEnumeratorField
+class RP_EXPORTS CameraEnumeratorField
 {
 public:
     std::string name;
@@ -33,10 +44,10 @@ public:
     CameraEnumeratorField(std::string name, std::string type, std::string text, std::string value = "");
 };
 
-class CameraEnumerator
+class RP_EXPORTS CameraEnumerator
 {
 public:
-    CameraEnumerator();
+    CameraEnumerator(CaptureBackend backend);
     virtual ~CameraEnumerator();
 
     virtual bool detectCameras() = 0;
@@ -48,15 +59,16 @@ public:
     virtual std::string getCameraDescription(const std::string& id);
     virtual int count();
 
+    CaptureBackend backend;
     std::string cameraType;
     std::vector<CameraInfo> listCameras;
     std::vector<CameraEnumeratorField> listRequiredField;//first : field name, second : field type ("text", "number")
 };
 
-class CameraInterface
+class RP_EXPORTS CameraInterface
 {
 public:
-    CameraInterface();
+    CameraInterface(CaptureBackend backend);
     virtual ~CameraInterface();
     virtual bool open(std::string params) = 0;
     virtual bool close() = 0;
@@ -76,9 +88,11 @@ public:
     virtual void selectVideoCodec(VideoCodecType codec);
     virtual std::shared_ptr<ImageData> getNewFrame(bool skipOldFrames) = 0;
     virtual std::string getErrorMsg();
+
+    CaptureBackend backend;
 };
 
-class CameraInterfaceFactory
+class RP_EXPORTS CameraInterfaceFactory
 {
 public:
     CameraInterfaceFactory();
@@ -86,7 +100,7 @@ public:
     virtual CameraInterface *createInterface() = 0;
 };
 
-class CameraEnumAndFactory
+class RP_EXPORTS CameraEnumAndFactory
 {
 public:
     CameraEnumerator* enumerator;
@@ -95,20 +109,9 @@ public:
     CameraEnumAndFactory(CameraEnumerator* enumerator, CameraInterfaceFactory*  interfaceFactory);
 };
 
-class CameraMngr
-{
-public:
-    std::vector<CameraEnumAndFactory> listCameraEnumAndFactory;
-
-    void registerEnumAndFactory(CameraEnumerator* enumerator, CameraInterfaceFactory* factory);
-
-    static CameraMngr *getInstance();
-private:
-    static CameraMngr *instance;
-
-    CameraMngr();
-    ~CameraMngr();
-};
+RP_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends();
+RP_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend backend);
+RP_EXPORTS std::shared_ptr<CameraInterface> getCameraInterface(CaptureBackend backend);
 
 }//RPCameraInterface
 

@@ -1,13 +1,24 @@
-cmake_minimum_required(VERSION 2.8.12)
-project (RPCameraInterface)
+cmake_minimum_required(VERSION 3.16)
+project (RPCameraInterface VERSION 0.1)
 set(CMAKE_CXX_STANDARD 11)
 
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
+include(FetchContent)
+include(GNUInstallDirs)
 
 option(USE_QT "Use QT" OFF)
 option(USE_OPENCV "Use OpenCV" OFF)
 option(BUILD_DEMO "Build DEMO" OFF)
+
+set(EXTERNAL_INSTALL_LOCATION deps)
+
+FetchContent_Populate(
+    BufferedSocket
+    GIT_REPOSITORY https://github.com/RandomPrototypes/BufferedSocket.git
+    GIT_TAG 45c3d9e33f20aafa19ec4f03d39dcbc9c529726a
+)
+SET(BufferedSocket ${bufferedsocket_SOURCE_DIR})
 
 if(WIN32)
    SET(FFMPEG_DIR "" CACHE STRING "ffmpeg dir")
@@ -39,6 +50,9 @@ set(LIB_SRC
 	src/ImageData.cpp
 	src/ImageFormat.cpp
 	src/ImageFormatConverter.cpp
+	src/CameraInterfaceAndroid.cpp
+	${BufferedSocket}/BufferedSocket.h
+        ${BufferedSocket}/BufferedSocket.cpp
 )
 
 set(LIB_INCLUDE
@@ -46,6 +60,7 @@ set(LIB_INCLUDE
 	include/RPCameraInterface/ImageData.h
 	include/RPCameraInterface/ImageFormat.h
 	include/RPCameraInterface/ImageFormatConverter.h
+	include/RPCameraInterface/CameraInterfaceAndroid.h
 )
 
 if(${USE_QT})
@@ -89,9 +104,12 @@ else()
     message(STATUS "    DirectShow: NO")
 endif()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${BufferedSocket})
 
-add_library(RPCameraInterface STATIC ${LIB_SRC} ${LIB_INCLUDE})
+add_library(RPCameraInterface SHARED ${LIB_SRC} ${LIB_INCLUDE})
+set_target_properties(RPCameraInterface PROPERTIES VERSION ${PROJECT_VERSION})
+#set_target_properties(RPCameraInterface PROPERTIES PUBLIC_HEADER ${LIB_INCLUDE})
+
 if(BUILD_DEMO)
    add_executable(RPCameraInterfaceDemo ${LIB_INCLUDE} demo/main.cpp)
 endif()
@@ -108,6 +126,9 @@ target_link_libraries(RPCameraInterface PRIVATE
         libswresample
         libswscale
         libavutil)
+if(WIN32)
+   target_link_libraries(RPCameraInterface PRIVATE ws2_32)
+endif()
 if(${USE_OPENCV})
    target_link_libraries(RPCameraInterface PRIVATE ${OpenCV_LIBS})
 endif()
@@ -117,6 +138,13 @@ if(BUILD_DEMO)
    target_link_libraries(RPCameraInterfaceDemo LINK_PUBLIC RPCameraInterface)
 endif()
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include DESTINATION . PATTERN "*.h")
-install(TARGETS RPCameraInterface DESTINATION lib/ EXPORT RPCameraInterface-config)
+install(TARGETS RPCameraInterface  EXPORT RPCameraInterface-config
+    ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR})
+#install(TARGETS RPCameraInterface DESTINATION lib/ EXPORT RPCameraInterface-config)
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include DESTINATION . PATTERN "*.h")	
 install(EXPORT RPCameraInterface-config DESTINATION lib/cmake/RPCameraInterface)
+export(TARGETS RPCameraInterface FILE RPCameraInterface-config.cmake)

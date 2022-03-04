@@ -2,6 +2,7 @@
 #define IMAGEFORMAT_H
 
 #include <string>
+#include "RPCameraInterfaceDefs.h"
 
 namespace RPCameraInterface
 {
@@ -42,9 +43,9 @@ enum class VideoContainerType
     MP4
 };
 
-std::string toString(ImageType type);
+RP_EXPORTS std::string toString(ImageType type);
 
-class ImageFormat
+class RP_EXPORTS ImageFormat
 {
 public:
     int width, height;
