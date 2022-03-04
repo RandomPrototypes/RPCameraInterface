@@ -11,6 +11,11 @@ Similar to OpenCV camera interface but with a few differences :
 * Easy formats conversion based on ffmpeg
 * Support on-device recording with preview (only for Android phones currently, but plan to add Raspberry pi, Oak-D,... later)
 
+### On-device recording
+Some devices have capability to record videos directly. This can be useful to reduce the required bandwidth while keeping high-framerate and high-resolution recording.
+Preview can be streamed at low-resolution.
+This currently only includes Android phones, but more will be added later.
+
 ### License
 Apache 2
 
