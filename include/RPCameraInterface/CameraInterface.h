@@ -110,8 +110,8 @@ public:
 };
 
 RP_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends();
-RP_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend backend);
-RP_EXPORTS std::shared_ptr<CameraInterface> getCameraInterface(CaptureBackend backend);
+RP_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend backend = CaptureBackend::Any);
+RP_EXPORTS std::shared_ptr<CameraInterface> getCameraInterface(CaptureBackend backend = CaptureBackend::Any);
 
 }//RPCameraInterface
 

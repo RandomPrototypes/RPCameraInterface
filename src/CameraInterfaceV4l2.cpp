@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <algorithm>
 
 #include <getopt.h>             /* getopt_long() */
 
@@ -18,6 +19,7 @@
 #include <sys/ioctl.h>
 
 #include <linux/videodev2.h>
+#include <dirent.h> //to list dir's content
 
 //based on https://www.kernel.org/doc/html/latest/userspace-api/media/v4l/capture.c.html
 
@@ -37,7 +39,7 @@ unsigned int ImageTypeToV4L2(ImageType type)
 {
     if(type == ImageType::YUYV422)
         return V4L2_PIX_FMT_YUYV;
-    else if(type == ImageType::MJPG)
+    else if(type == ImageType::JPG)
         return V4L2_PIX_FMT_MJPEG;
     else return -1;
 }
@@ -47,7 +49,7 @@ ImageType V4L2ToImageType(unsigned int format)
     if(format == V4L2_PIX_FMT_YUYV)
         return ImageType::YUYV422;
     else if(format == V4L2_PIX_FMT_MJPEG)
-        return ImageType::MJPG;
+        return ImageType::JPG;
     else return ImageType::UNKNOWN;
 }
 
@@ -62,8 +64,66 @@ static int xioctl(int fh, int request, void *arg)
     return r;
 }
 
+CameraEnumeratorV4L2::CameraEnumeratorV4L2()
+    :CameraEnumerator(CaptureBackend::V4L2)
+{
+    cameraType = "USB camera";
+}
+
+CameraEnumeratorV4L2::~CameraEnumeratorV4L2()
+{
+}
+
+//from libwebcam
+static bool is_video_device(const char *name)
+{
+	std::string::size_type pos = std::string(name).find("video");
+	return pos != std::string::npos;
+}
+
+//based on code from libwebcam
+bool CameraEnumeratorV4L2::detectCameras()
+{
+    DIR * dp = opendir("/dev");
+	if (dp == nullptr) {
+		return false;
+	}
+
+	std::vector<std::string> files;
+	struct dirent * ep = nullptr;
+	while( (ep = readdir(dp)) )
+	{
+		if (is_video_device(ep->d_name))
+			files.push_back(std::string("/dev/") + ep->d_name);
+	}
+	closedir(dp);
+
+	std::sort(files.begin(), files.end());
+
+	listCameras.clear();
+	for(const std::string & device_file: files){
+
+		int fd = open(device_file.c_str(), O_RDONLY);
+		if(fd != -1){
+			CameraInfo cam;
+
+			struct v4l2_capability video_cap;
+			int res = ioctl(fd, VIDIOC_QUERYCAP, &video_cap);
+			if(res != -1)
+			{
+				cam.id = device_file;
+				cam.name = (const char*)video_cap.card;
+				listCameras.push_back(cam);
+			}
+			close(fd);
+		}
+	}
+    return true;
+}
+
 
 CameraInterfaceV4L2::CameraInterfaceV4L2()
+	:CameraInterface(CaptureBackend::V4L2)
 {
     fd = -1;
     selectedFormat = -1;

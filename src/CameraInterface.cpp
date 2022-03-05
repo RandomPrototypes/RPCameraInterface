@@ -3,8 +3,13 @@
 #include <chrono>
 
 #include "RPCameraInterface/CameraInterfaceAndroid.h"
+
 #ifdef HAVE_DSHOW
 #include "RPCameraInterface/CameraInterfaceDShow.h"
+#endif
+
+#ifdef HAVE_V4L2
+#include "RPCameraInterface/CameraInterfaceV4l2.h"
 #endif
 
 namespace RPCameraInterface
@@ -219,38 +224,64 @@ CameraEnumAndFactory::CameraEnumAndFactory(CameraEnumerator* enumerator, CameraI
 RP_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends()
 {
     std::vector<CaptureBackend> list;
-    list.push_back(CaptureBackend::RPNetworkCamera);
+    
     #ifdef HAVE_DSHOW
     list.push_back(CaptureBackend::DShow);
     #endif
+    
+    #ifdef HAVE_V4L2
+    list.push_back(CaptureBackend::V4L2);
+    #endif
 
-
+	list.push_back(CaptureBackend::RPNetworkCamera);
     return list;
 }
 RP_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend backend)
 {
+	if(backend == CaptureBackend::Any) {
+		std::vector<CaptureBackend> list = getAvailableCaptureBackends();
+		if(list.size() > 0)
+			backend = list[0];
+	}
     switch(backend)
     {
-        case CaptureBackend::RPNetworkCamera:
-            return std::make_shared<CameraEnumeratorAndroid>();
         #ifdef HAVE_DSHOW
         case CaptureBackend::DShow:
             return std::make_shared<CameraEnumeratorDShow>();
         #endif
+        
+        #ifdef HAVE_V4L2
+    	case CaptureBackend::V4L2:
+            return std::make_shared<CameraEnumeratorV4L2>();
+    	#endif
+    	
+    	case CaptureBackend::RPNetworkCamera:
+            return std::make_shared<CameraEnumeratorAndroid>();
     }
 
     return std::shared_ptr<CameraEnumerator>();
 }
 RP_EXPORTS std::shared_ptr<CameraInterface> getCameraInterface(CaptureBackend backend)
 {
+	if(backend == CaptureBackend::Any) {
+		std::vector<CaptureBackend> list = getAvailableCaptureBackends();
+		if(list.size() > 0)
+			backend = list[0];
+	}
     switch(backend)
     {
-        case CaptureBackend::RPNetworkCamera:
-            return std::make_shared<CameraInterfaceAndroid>();
         #ifdef HAVE_DSHOW
         case CaptureBackend::DShow:
             return std::make_shared<CameraInterfaceDShow>();
         #endif
+        
+        #ifdef HAVE_V4L2
+        case CaptureBackend::V4L2:
+            return std::make_shared<CameraInterfaceV4L2>();
+        #endif
+        
+    	case CaptureBackend::RPNetworkCamera:
+            return std::make_shared<CameraInterfaceAndroid>();
     }
 
     return std::shared_ptr<CameraInterface>();

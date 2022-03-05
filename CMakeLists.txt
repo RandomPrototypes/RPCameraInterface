@@ -7,6 +7,9 @@ include(CheckIncludeFiles)
 include(FetchContent)
 include(GNUInstallDirs)
 
+check_include_file(dshow.h HAVE_DSHOW)
+check_include_file(linux/videodev2.h HAVE_V4L2)
+
 option(USE_QT "Use QT" OFF)
 option(USE_OPENCV "Use OpenCV" OFF)
 option(BUILD_DEMO "Build DEMO" OFF)
@@ -34,15 +37,7 @@ if(WIN32)
    link_directories(${FFMPEG_LIB_DIR})
 else()
    find_package(PkgConfig REQUIRED)
-   pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
-        libavdevice
-        libavfilter
-        libavformat
-        libavcodec
-        libswresample
-        libswscale
-        libavutil
-   )
+   pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET libavdevice libavfilter libavformat libavcodec libswresample libswscale libavutil)
 endif()
 
 set(LIB_SRC
@@ -52,7 +47,7 @@ set(LIB_SRC
 	src/ImageFormatConverter.cpp
 	src/CameraInterfaceAndroid.cpp
 	${BufferedSocket}/BufferedSocket.h
-        ${BufferedSocket}/BufferedSocket.cpp
+    ${BufferedSocket}/BufferedSocket.cpp
 )
 
 set(LIB_INCLUDE
@@ -64,44 +59,40 @@ set(LIB_INCLUDE
 )
 
 if(${USE_QT})
-    set(LIB_SRC
-	${LIB_SRC}
-	src/CameraEnumeratorQt.cpp
-    )
-    set(LIB_INCLUDE
-	${LIB_INCLUDE}
-	include/RPCameraInterface/CameraEnumeratorQt.h
-    )
+    set(LIB_SRC ${LIB_SRC} src/CameraEnumeratorQt.cpp)
+    set(LIB_INCLUDE ${LIB_INCLUDE} include/RPCameraInterface/CameraEnumeratorQt.h)
 endif()
 
-if(${USE_OPENCV})
+if(${USE_OPENCV} OR ${BUILD_DEMO})
     find_package(OpenCV REQUIRED)
-    set(LIB_SRC
-	${LIB_SRC}
-	src/CameraInterfaceOpenCV.cpp
-    )
-    set(LIB_INCLUDE
-	${LIB_INCLUDE}
-	include/RPCameraInterface/CameraInterfaceOpenCV.h
-    )
 endif()
-
-check_include_file(dshow.h HAVE_DSHOW)
+if(${USE_OPENCV})
+    set(LIB_SRC ${LIB_SRC} src/CameraInterfaceOpenCV.cpp)
+    set(LIB_INCLUDE ${LIB_INCLUDE} include/RPCameraInterface/CameraInterfaceOpenCV.h)
+endif()
 
 if(HAVE_DSHOW)
-   message(STATUS "    DirectShow: YES")
-   set(LIB_SRC
-	${LIB_SRC}
-	src/CameraInterfaceDShow.cpp
-	src/cap_dshow/cap_dshow.cpp
+	message(STATUS "    DirectShow: YES")
+	set(LIB_SRC
+		${LIB_SRC}
+		src/CameraInterfaceDShow.cpp
+		src/cap_dshow/cap_dshow.cpp
     )
     set(LIB_INCLUDE
-	${LIB_INCLUDE}
-	include/RPCameraInterface/CameraInterfaceDShow.h
-	src/cap_dshow/cap_dshow.hpp
+		${LIB_INCLUDE}
+		include/RPCameraInterface/CameraInterfaceDShow.h
+		src/cap_dshow/cap_dshow.hpp
     )
 else()
     message(STATUS "    DirectShow: NO")
+endif()
+
+if(HAVE_V4L2)
+	message(STATUS "    V4L2      : YES")
+	set(LIB_SRC ${LIB_SRC} src/CameraInterfaceV4l2.cpp)
+    set(LIB_INCLUDE ${LIB_INCLUDE} include/RPCameraInterface/CameraInterfaceV4l2.h)
+else()
+	message(STATUS "    V4L2      : NO")
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${BufferedSocket})
@@ -117,17 +108,15 @@ endif()
 if(HAVE_DSHOW)
    target_compile_definitions(RPCameraInterface PUBLIC "HAVE_DSHOW")
 endif()
+if(HAVE_V4L2)
+	target_compile_definitions(RPCameraInterface PUBLIC "HAVE_V4L2")
+endif()
 
-target_link_libraries(RPCameraInterface PRIVATE 
-	libavdevice
-        libavfilter
-        libavformat
-        libavcodec
-        libswresample
-        libswscale
-        libavutil)
 if(WIN32)
+   target_link_libraries(RPCameraInterface PRIVATE libavdevice libavfilter libavformat libavcodec libswresample libswscale libavutil)
    target_link_libraries(RPCameraInterface PRIVATE ws2_32)
+else()
+   target_link_libraries(RPCameraInterface PRIVATE PkgConfig::LIBAV)
 endif()
 if(${USE_OPENCV})
    target_link_libraries(RPCameraInterface PRIVATE ${OpenCV_LIBS})

@@ -18,6 +18,15 @@ struct V4L2_buffer {
     size_t  length;
 };
 
+class CameraEnumeratorV4L2 : public CameraEnumerator
+{
+public:
+    CameraEnumeratorV4L2();
+    virtual ~CameraEnumeratorV4L2();
+
+    virtual bool detectCameras();
+};
+
 class CameraInterfaceV4L2 : public CameraInterface
 {
 public:
