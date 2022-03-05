@@ -1,4 +1,4 @@
-#include <RPCameraInterface/CameraInterfaceV4l2.h>
+#include <RPCameraInterface/CameraInterfaceV4L2.h>
 
 
 #include <stdio.h>

@@ -9,7 +9,7 @@
 #endif
 
 #ifdef HAVE_V4L2
-#include "RPCameraInterface/CameraInterfaceV4l2.h"
+#include "RPCameraInterface/CameraInterfaceV4L2.h"
 #endif
 
 namespace RPCameraInterface
