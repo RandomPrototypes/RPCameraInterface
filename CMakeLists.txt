@@ -45,7 +45,7 @@ set(LIB_SRC
 	src/ImageData.cpp
 	src/ImageFormat.cpp
 	src/ImageFormatConverter.cpp
-	src/CameraInterfaceAndroid.cpp
+	src/CameraInterfaceRPNetwork.cpp
 	${BufferedSocket}/BufferedSocket.h
     ${BufferedSocket}/BufferedSocket.cpp
 )
@@ -55,7 +55,7 @@ set(LIB_INCLUDE
 	include/RPCameraInterface/ImageData.h
 	include/RPCameraInterface/ImageFormat.h
 	include/RPCameraInterface/ImageFormatConverter.h
-	include/RPCameraInterface/CameraInterfaceAndroid.h
+	include/RPCameraInterface/CameraInterfaceRPNetwork.h
 )
 
 if(${USE_QT})

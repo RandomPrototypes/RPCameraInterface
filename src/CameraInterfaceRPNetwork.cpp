@@ -1,10 +1,10 @@
-#include <RPCameraInterface/CameraInterfaceAndroid.h>
+#include <RPCameraInterface/CameraInterfaceRPNetwork.h>
 //#include <QDebug>
 
 namespace RPCameraInterface
 {
 
-enum AndroidCameraCmd
+enum RPNetworkCameraCmd
 {
     EXIT = 100,
     LIST_CAMERAS =200,
@@ -14,15 +14,15 @@ enum AndroidCameraCmd
     CAPTURE_IMG = 600
 };
 
-CameraEnumeratorAndroid::CameraEnumeratorAndroid()
+CameraEnumeratorRPNetwork::CameraEnumeratorRPNetwork()
     :CameraEnumerator(CaptureBackend::RPNetworkCamera)
 {
-    cameraType = "Android phone";
-    listRequiredField.push_back(CameraEnumeratorField("ip_address", "text", "ip address", "192.168."));
+    cameraType = "Network camera";
+    listRequiredField.push_back(CameraEnumeratorField("ip_address", "text", "ip address", ""));
     listRequiredField.push_back(CameraEnumeratorField("port", "text", "port", "25600"));
 }
 
-CameraEnumeratorAndroid::~CameraEnumeratorAndroid()
+CameraEnumeratorRPNetwork::~CameraEnumeratorRPNetwork()
 {
 }
 
@@ -42,7 +42,7 @@ std::vector<std::string> splitString(const char* str, int length, char delim)
     return list;
 }
 
-bool CameraEnumeratorAndroid::detectCameras()
+bool CameraEnumeratorRPNetwork::detectCameras()
 {
     //qDebug() << "detectCameras";
     listCameras.clear();
@@ -54,10 +54,10 @@ bool CameraEnumeratorAndroid::detectCameras()
         return false;
     }
     //qDebug() << "connected";
-    bufferedSock.sendInt32(AndroidCameraCmd::LIST_CAMERAS);
+    bufferedSock.sendInt32(RPNetworkCameraCmd::LIST_CAMERAS);
     bufferedSock.sendInt64(0);
     int ret = bufferedSock.readInt32();
-    if(ret != AndroidCameraCmd::LIST_CAMERAS)
+    if(ret != RPNetworkCameraCmd::LIST_CAMERAS)
     {
         //qDebug() << "bad reply";
         bufferedSock.disconnect();
@@ -94,18 +94,18 @@ bool CameraEnumeratorAndroid::detectCameras()
 
 
 
-CameraInterfaceAndroid::CameraInterfaceAndroid()
+CameraInterfaceRPNetwork::CameraInterfaceRPNetwork()
     :CameraInterface(CaptureBackend::RPNetworkCamera)
 {
 }
 
-CameraInterfaceAndroid::~CameraInterfaceAndroid()
+CameraInterfaceRPNetwork::~CameraInterfaceRPNetwork()
 {
 }
 
-bool CameraInterfaceAndroid::open(std::string params)
+bool CameraInterfaceRPNetwork::open(std::string params)
 {
-    //qDebug() << "CameraInterfaceAndroid::open(\"" << params.c_str() << "\")";
+    //qDebug() << "CameraInterfaceRPNetwork::open(\"" << params.c_str() << "\")";
     std::vector<std::string> list_params = splitString(params.c_str(), params.length(), ':');
     if(!bufferedSock.connect(list_params[0], std::stoi(list_params[1])))
     {
@@ -119,13 +119,13 @@ bool CameraInterfaceAndroid::open(std::string params)
     return true;
 }
 
-bool CameraInterfaceAndroid::close()
+bool CameraInterfaceRPNetwork::close()
 {
     bufferedSock.disconnect();
     return true;
 }
 
-std::vector<ImageFormat> CameraInterfaceAndroid::getAvailableFormats()
+std::vector<ImageFormat> CameraInterfaceRPNetwork::getAvailableFormats()
 {
     std::vector<ImageFormat> listFormats(1);
     listFormats[0].width = 640;
@@ -139,37 +139,37 @@ std::vector<ImageFormat> CameraInterfaceAndroid::getAvailableFormats()
     return listFormats;
 }
 
-std::vector<VideoCodecType> CameraInterfaceAndroid::getAvailableVideoCodec()
+std::vector<VideoCodecType> CameraInterfaceRPNetwork::getAvailableVideoCodec()
 {
     std::vector<VideoCodecType> list;
     list.push_back(VideoCodecType::H264);
     return list;
 }
 
-std::vector<VideoContainerType> CameraInterfaceAndroid::getAvailableVideoContainer()
+std::vector<VideoContainerType> CameraInterfaceRPNetwork::getAvailableVideoContainer()
 {
     std::vector<VideoContainerType> list;
     list.push_back(VideoContainerType::MP4);
     return list;
 }
 
-void CameraInterfaceAndroid::selectFormat(ImageFormat format)
+void CameraInterfaceRPNetwork::selectFormat(ImageFormat format)
 {
     imageFormat = format;
 }
 
 
-void CameraInterfaceAndroid::selectVideoContainer(VideoContainerType container)
+void CameraInterfaceRPNetwork::selectVideoContainer(VideoContainerType container)
 {
     videoContainerType = container;
 }
 
-void CameraInterfaceAndroid::selectVideoCodec(VideoCodecType codec)
+void CameraInterfaceRPNetwork::selectVideoCodec(VideoCodecType codec)
 {
     videoCodecType = codec;
 }
 
-std::shared_ptr<ImageData> CameraInterfaceAndroid::getNewFrame(bool skipOldFrames)
+std::shared_ptr<ImageData> CameraInterfaceRPNetwork::getNewFrame(bool skipOldFrames)
 {
     bufferedSock.sendInt32(CAPTURE_IMG);
     DataPacket packet;
@@ -203,26 +203,26 @@ std::shared_ptr<ImageData> CameraInterfaceAndroid::getNewFrame(bool skipOldFrame
     //qDebug() << "new frame, id : " << frame_id << "timestamp : " << img->timestamp;
     return img;
 }
-std::string CameraInterfaceAndroid::getErrorMsg()
+std::string CameraInterfaceRPNetwork::getErrorMsg()
 {
     return errorMsg;
 }
 
-bool CameraInterfaceAndroid::startCapturing()
+bool CameraInterfaceRPNetwork::startCapturing()
 {
     return true;
 }
 
-bool CameraInterfaceAndroid::stopCapturing()
+bool CameraInterfaceRPNetwork::stopCapturing()
 {
     return true;
 }
 
-bool CameraInterfaceAndroid::hasRecordingCapability()
+bool CameraInterfaceRPNetwork::hasRecordingCapability()
 {
     return true;
 }
-bool CameraInterfaceAndroid::startRecording()
+bool CameraInterfaceRPNetwork::startRecording()
 {
     bufferedSock.sendInt32(START_RECORDING);
     bufferedSock.sendInt64(0);
@@ -234,7 +234,7 @@ bool CameraInterfaceAndroid::startRecording()
     }
     return true;
 }
-bool CameraInterfaceAndroid::stopRecordingAndSaveToFile(std::string videoFilename, std::string timestampFilename)
+bool CameraInterfaceRPNetwork::stopRecordingAndSaveToFile(std::string videoFilename, std::string timestampFilename)
 {
     bufferedSock.sendInt32(STOP_RECORDING);
     bufferedSock.sendInt64(0);
@@ -275,7 +275,7 @@ bool CameraInterfaceAndroid::stopRecordingAndSaveToFile(std::string videoFilenam
     return true;
 }
 
-bool CameraInterfaceAndroid::syncTimestamp()
+bool CameraInterfaceRPNetwork::syncTimestamp()
 {
     bufferedSock.sendInt32(TIMESTAMP);
     bufferedSock.sendInt64(0);
@@ -287,28 +287,11 @@ bool CameraInterfaceAndroid::syncTimestamp()
         return false;
     }
     uint64_t endTimestamp = getTimestampMs();
-    int64_t androidTimestampMs = bufferedSock.readInt64();
+    int64_t targetTimestampMs = bufferedSock.readInt64();
     //qDebug() << "roundtrip time : " << (endTimestamp - startTimestamp) << "ms";
-    timestampOffsetMs = ((int64_t)(startTimestamp+endTimestamp)/2) - androidTimestampMs;
+    timestampOffsetMs = ((int64_t)(startTimestamp+endTimestamp)/2) - targetTimestampMs;
     //qDebug() << "offset : " << timestampOffsetMs << "ms";
     return true;
-}
-
-
-
-
-
-CameraInterfaceFactoryAndroid::CameraInterfaceFactoryAndroid()
-{
-}
-
-CameraInterfaceFactoryAndroid::~CameraInterfaceFactoryAndroid()
-{
-}
-
-CameraInterface *CameraInterfaceFactoryAndroid::createInterface()
-{
-    return new CameraInterfaceAndroid();
 }
 
 }

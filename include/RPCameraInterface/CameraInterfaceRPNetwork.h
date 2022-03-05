@@ -1,5 +1,5 @@
-#ifndef CAMERAINTERFACEANDROID_H
-#define CAMERAINTERFACEANDROID_H
+#ifndef CAMERAINTERFACERPNETWORK_H
+#define CAMERAINTERFACERPNETWORK_H
 
 #include "CameraInterface.h"
 #include "BufferedSocket.h"
@@ -8,20 +8,20 @@
 namespace RPCameraInterface
 {
 
-class CameraEnumeratorAndroid : public CameraEnumerator
+class CameraEnumeratorRPNetwork : public CameraEnumerator
 {
 public:
-    CameraEnumeratorAndroid();
-    virtual ~CameraEnumeratorAndroid();
+    CameraEnumeratorRPNetwork();
+    virtual ~CameraEnumeratorRPNetwork();
 
     virtual bool detectCameras();
 };
 
-class CameraInterfaceAndroid : public CameraInterface
+class CameraInterfaceRPNetwork : public CameraInterface
 {
 public:
-    CameraInterfaceAndroid();
-    ~CameraInterfaceAndroid();
+    CameraInterfaceRPNetwork();
+    ~CameraInterfaceRPNetwork();
     virtual bool open(std::string params);
     virtual bool close();
     virtual std::vector<ImageFormat> getAvailableFormats();
@@ -49,14 +49,6 @@ private:
     BufferedSocket bufferedSock;
     std::string errorMsg;
     int64_t timestampOffsetMs;
-};
-
-class CameraInterfaceFactoryAndroid : public CameraInterfaceFactory
-{
-public:
-    CameraInterfaceFactoryAndroid();
-    virtual ~CameraInterfaceFactoryAndroid();
-    virtual CameraInterface *createInterface();
 };
 
 }

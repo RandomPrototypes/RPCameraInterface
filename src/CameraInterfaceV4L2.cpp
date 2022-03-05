@@ -751,19 +751,4 @@ std::string CameraInterfaceV4L2::getErrorMsg()
     return errorMsg.str();
 }
 
-
-
-CameraInterfaceFactoryV4L2::CameraInterfaceFactoryV4L2()
-{
-}
-
-CameraInterfaceFactoryV4L2::~CameraInterfaceFactoryV4L2()
-{
-}
-
-CameraInterface *CameraInterfaceFactoryV4L2::createInterface()
-{
-    return new CameraInterfaceV4L2();
-}
-
 }

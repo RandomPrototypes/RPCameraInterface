@@ -92,23 +92,6 @@ public:
     CaptureBackend backend;
 };
 
-class RP_EXPORTS CameraInterfaceFactory
-{
-public:
-    CameraInterfaceFactory();
-    virtual ~CameraInterfaceFactory();
-    virtual CameraInterface *createInterface() = 0;
-};
-
-class RP_EXPORTS CameraEnumAndFactory
-{
-public:
-    CameraEnumerator* enumerator;
-    CameraInterfaceFactory*  interfaceFactory;
-
-    CameraEnumAndFactory(CameraEnumerator* enumerator, CameraInterfaceFactory*  interfaceFactory);
-};
-
 RP_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends();
 RP_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend backend = CaptureBackend::Any);
 RP_EXPORTS std::shared_ptr<CameraInterface> getCameraInterface(CaptureBackend backend = CaptureBackend::Any);

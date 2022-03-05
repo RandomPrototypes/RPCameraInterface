@@ -2,7 +2,7 @@
 #include <sstream>
 #include <chrono>
 
-#include "RPCameraInterface/CameraInterfaceAndroid.h"
+#include "RPCameraInterface/CameraInterfaceRPNetwork.h"
 
 #ifdef HAVE_DSHOW
 #include "RPCameraInterface/CameraInterfaceDShow.h"
@@ -143,14 +143,6 @@ std::string CameraInterface::getErrorMsg()
     return "";
 }
 
-CameraInterfaceFactory::CameraInterfaceFactory()
-{
-}
-
-CameraInterfaceFactory::~CameraInterfaceFactory()
-{
-}
-
 CameraEnumeratorField::CameraEnumeratorField(std::string name, std::string type, std::string text, std::string value)
     :name(name), type(type), text(text), value(value)
 {
@@ -215,12 +207,6 @@ std::string CameraEnumerator::getCameraDescription(const std::string& id)
     return "unknown";
 }
 
-CameraEnumAndFactory::CameraEnumAndFactory(CameraEnumerator* enumerator, CameraInterfaceFactory*  interfaceFactory)
-    :enumerator(enumerator), interfaceFactory(interfaceFactory)
-{
-
-}
-
 RP_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends()
 {
     std::vector<CaptureBackend> list;
@@ -256,7 +242,7 @@ RP_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend 
     	#endif
     	
     	case CaptureBackend::RPNetworkCamera:
-            return std::make_shared<CameraEnumeratorAndroid>();
+            return std::make_shared<CameraEnumeratorRPNetwork>();
     }
 
     return std::shared_ptr<CameraEnumerator>();
@@ -281,7 +267,7 @@ RP_EXPORTS std::shared_ptr<CameraInterface> getCameraInterface(CaptureBackend ba
         #endif
         
     	case CaptureBackend::RPNetworkCamera:
-            return std::make_shared<CameraInterfaceAndroid>();
+            return std::make_shared<CameraInterfaceRPNetwork>();
     }
 
     return std::shared_ptr<CameraInterface>();

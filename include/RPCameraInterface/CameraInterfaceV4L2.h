@@ -76,14 +76,6 @@ private:
     unsigned int n_buffers;
 };
 
-class CameraInterfaceFactoryV4L2 : public CameraInterfaceFactory
-{
-public:
-    CameraInterfaceFactoryV4L2();
-    virtual ~CameraInterfaceFactoryV4L2();
-    virtual CameraInterface *createInterface();
-};
-
 }
 
 #endif // CAMERAINTERFACEV4L2_H
