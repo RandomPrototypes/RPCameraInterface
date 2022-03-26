@@ -19,7 +19,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macOS-latest]
+        #os: [ubuntu-latest, macOS-latest]
+        os: [windows-latest]
 
     steps:
     - uses: actions/checkout@v2
@@ -31,6 +32,9 @@ jobs:
           sudo apt -y install pkg-config 
           sudo apt -y install libavcodec-dev libavformat-dev libswscale-dev libavdevice-dev libavfilter-dev
           sudo apt -y install libopencv-dev
+        elif [ "$RUNNER_OS" == "Windows" ]; then
+          wget -O ${{github.workspace}}/ffmpeg.zip https://github.com/BtbN/FFmpeg-Builds/archive/refs/tags/latest.zip
+          7z x ${{github.workspace}}/ffmpeg.zip
         elif [ "$RUNNER_OS" == "macOS" ]; then
           brew install pkg-config
           brew install ffmpeg
@@ -40,7 +44,12 @@ jobs:
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUSE_OPENCV=ON
+      run: |
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUSE_OPENCV=OFF -DFFMPEG_DIR=${{github.workspace}}/ffmpeg
+        else
+          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUSE_OPENCV=ON
+        fi
 
     - name: Build
       # Build your program with the given configuration
