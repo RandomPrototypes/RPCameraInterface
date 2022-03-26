@@ -36,17 +36,17 @@ jobs:
     - name: Install libav and OpenCV
       if: runner.os == 'Windows'
       run: |
-        C:\msys64\usr\bin\wget.exe -O ${{github.workspace}}/opencv.zip https://github.com/opencv/opencv/archive/refs/tags/3.4.7.zip
+        C:\msys64\usr\bin\wget.exe -q -O ${{github.workspace}}/opencv.zip https://github.com/opencv/opencv/archive/refs/tags/3.4.16.zip
         7z x ${{github.workspace}}/opencv.zip -o"${{github.workspace}}"
-        mv ${{github.workspace}}/opencv-3.4.7 ${{github.workspace}}/opencv
+        mv ${{github.workspace}}/opencv-3.4.16 ${{github.workspace}}/opencv
         cd ${{github.workspace}}/opencv
         mkdir release
         mkdir install
         cd release
-        cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/opencv/install -DWITH_CUDA=OFF ..
+        cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/opencv/install -DWITH_CUDA=OFF -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_EXAMPLES=OFF ..
         cmake --build ${{github.workspace}}/opencv/release --config ${{env.BUILD_TYPE}}
         cmake --install ${{github.workspace}}/opencv/release 
-        C:\msys64\usr\bin\wget.exe -O ${{github.workspace}}/ffmpeg.zip https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n5.0-latest-win64-gpl-shared-5.0.zip
+        C:\msys64\usr\bin\wget.exe -q -O ${{github.workspace}}/ffmpeg.zip https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n5.0-latest-win64-gpl-shared-5.0.zip
         7z x ${{github.workspace}}/ffmpeg.zip -o"${{github.workspace}}"
         mv ${{github.workspace}}/ffmpeg-n5.0-latest-win64-gpl-shared-5.0 ${{github.workspace}}/ffmpeg
 
