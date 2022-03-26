@@ -40,8 +40,8 @@ jobs:
         7z x ${{github.workspace}}/opencv.zip -o"${{github.workspace}}"
         mv ${{github.workspace}}/opencv-3.4.7 ${{github.workspace}}/opencv
         cd ${{github.workspace}}/opencv
-        mkdir release
-        mkdir install
+        msbuild.exe ALL_BUILD.vcxproj
+        msbuild.exe INSTALL.vcxproj
         cd release
         cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/opencv/install -DWITH_CUDA=OFF ..
         make
