@@ -62,7 +62,7 @@ jobs:
     - name: Configure CMake
       if: runner.os != 'Windows'
       run: |
-        cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUSE_OPENCV=ON -DOpenCV_DIR=${{github.workspace}}/opencv/install/x64/vc17/lib
+        cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUSE_OPENCV=ON -DOpenCV_DIR=${{github.workspace}}/opencv/install/lib
 
     - name: Configure CMake
       if: runner.os == 'Windows'
