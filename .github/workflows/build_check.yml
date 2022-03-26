@@ -37,7 +37,7 @@ jobs:
       if: runner.os == 'Windows'
       run: |
         C:\msys64\usr\bin\wget.exe -O ${{github.workspace}}/ffmpeg.zip https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n5.0-latest-win64-gpl-shared-5.0.zip
-        7z x ${{github.workspace}}/ffmpeg-n5.0-latest-win64-gpl-shared-5.0.zip -o"${{github.workspace}}"
+        7z x ${{github.workspace}}/ffmpeg.zip -o"${{github.workspace}}"
         mv ${{github.workspace}}/ffmpeg-n5.0-latest-win64-gpl-shared-5.0 ${{github.workspace}}/ffmpeg
 
     - name: Install libav and OpenCV
