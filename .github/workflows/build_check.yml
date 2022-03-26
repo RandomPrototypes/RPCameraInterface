@@ -36,7 +36,7 @@ jobs:
     - name: Install libav and OpenCV
       if: runner.os == 'Windows'
       run: |
-        C:\msys64\usr\bin\wget.exe -O ${{github.workspace}}/opencv.zip https://github.com/opencv/opencv/archive/refs/tags/3.2.0.zip2
+        C:\msys64\usr\bin\wget.exe -O ${{github.workspace}}/opencv.zip https://github.com/opencv/opencv/archive/refs/tags/3.2.0.zip
         7z x ${{github.workspace}}/opencv.zip -o"${{github.workspace}}"
         mv ${{github.workspace}}/opencv-3.2.0 ${{github.workspace}}/opencv
         cd ${{github.workspace}}/opencv
