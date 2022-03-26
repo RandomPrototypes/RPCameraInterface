@@ -130,17 +130,4 @@ bool CameraInterfaceOpenCV::stopCapturing()
     return true;
 }
 
-CameraInterfaceFactoryOpenCV::CameraInterfaceFactoryOpenCV()
-{
-}
-
-CameraInterfaceFactoryOpenCV::~CameraInterfaceFactoryOpenCV()
-{
-}
-
-CameraInterface *CameraInterfaceFactoryOpenCV::createInterface()
-{
-    return new CameraInterfaceOpenCV();
-}
-
 }

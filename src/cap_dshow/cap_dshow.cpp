@@ -295,7 +295,7 @@ interface ISampleGrabber : public IUnknown
 
 //#define _DEBUG
 
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 #include <strsafe.h>
 
 static void DebugPrintOut(const char *format, ...)
@@ -329,6 +329,12 @@ static void DebugPrintOut(const char *format, ...)
 #else
 //#define DebugPrintOut(...) void()
 #define DebugPrintOut printf
+#endif*/
+
+#ifdef _DEBUG
+#define DebugPrintOut printf
+#else
+#define DebugPrintOut(...) void()
 #endif
 
 //if you need VI to use multi threaded com

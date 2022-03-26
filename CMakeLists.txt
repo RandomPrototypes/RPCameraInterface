@@ -19,7 +19,7 @@ set(EXTERNAL_INSTALL_LOCATION deps)
 FetchContent_Populate(
     BufferedSocket
     GIT_REPOSITORY https://github.com/RandomPrototypes/BufferedSocket.git
-    GIT_TAG 45c3d9e33f20aafa19ec4f03d39dcbc9c529726a
+    GIT_TAG 46ce2df10989871628a83e69ce63480b5d6f8a90
 )
 SET(BufferedSocket ${bufferedsocket_SOURCE_DIR})
 
@@ -98,6 +98,8 @@ endif()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${BufferedSocket})
 
 add_library(RPCameraInterface SHARED ${LIB_SRC} ${LIB_INCLUDE})
+target_compile_definitions(RPCameraInterface PRIVATE "RPCAMERAINTERFACE_EXPORTS")
+
 set_target_properties(RPCameraInterface PROPERTIES VERSION ${PROJECT_VERSION})
 #set_target_properties(RPCameraInterface PROPERTIES PUBLIC_HEADER ${LIB_INCLUDE})
 
@@ -113,7 +115,11 @@ if(HAVE_V4L2)
 endif()
 
 if(WIN32)
-   target_link_libraries(RPCameraInterface PRIVATE libavdevice libavfilter libavformat libavcodec libswresample libswscale libavutil)
+   if(MSVC)
+      target_link_libraries(RPCameraInterface PRIVATE avdevice avfilter avformat avcodec swresample swscale avutil)
+   else()
+      target_link_libraries(RPCameraInterface PRIVATE libavdevice libavfilter libavformat libavcodec libswresample libswscale libavutil)
+   endif()
    target_link_libraries(RPCameraInterface PRIVATE ws2_32)
 else()
    target_link_libraries(RPCameraInterface PRIVATE PkgConfig::LIBAV)

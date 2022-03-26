@@ -52,14 +52,6 @@ private:
     int cameraId;
 };
 
-class CameraInterfaceFactoryDShow : public CameraInterfaceFactory
-{
-public:
-    CameraInterfaceFactoryDShow();
-    virtual ~CameraInterfaceFactoryDShow();
-    virtual CameraInterface *createInterface();
-};
-
 }
 
 #endif // CAMERAINTERFACEDSHOW_H

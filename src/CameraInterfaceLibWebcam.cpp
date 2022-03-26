@@ -214,17 +214,4 @@ bool CameraInterfaceLibWebcam::stopCapturing()
     return false;
 }
 
-CameraInterfaceFactoryLibWebcam::CameraInterfaceFactoryLibWebcam()
-{
-}
-
-CameraInterfaceFactoryLibWebcam::~CameraInterfaceFactoryLibWebcam()
-{
-}
-
-CameraInterface *CameraInterfaceFactoryLibWebcam::createInterface()
-{
-    return new CameraInterfaceLibWebcam();
-}
-
 }

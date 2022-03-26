@@ -201,17 +201,4 @@ bool CameraInterfaceDShow::stopCapturing()
     return false;
 }
 
-CameraInterfaceFactoryDShow::CameraInterfaceFactoryDShow()
-{
-}
-
-CameraInterfaceFactoryDShow::~CameraInterfaceFactoryDShow()
-{
-}
-
-CameraInterface *CameraInterfaceFactoryDShow::createInterface()
-{
-    return new CameraInterfaceDShow();
-}
-
 }

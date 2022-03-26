@@ -32,14 +32,6 @@ private:
     cv::Mat frame;
 };
 
-class CameraInterfaceFactoryOpenCV : public CameraInterfaceFactory
-{
-public:
-    CameraInterfaceFactoryOpenCV();
-    virtual ~CameraInterfaceFactoryOpenCV();
-    virtual CameraInterface *createInterface();
-};
-
 }
 
 #endif // CAMERAINTERFACELIBWEBCAM_H

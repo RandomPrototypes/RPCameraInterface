@@ -43,14 +43,6 @@ private:
     std::string errorMsg;
 };
 
-class CameraInterfaceFactoryLibWebcam : public CameraInterfaceFactory
-{
-public:
-    CameraInterfaceFactoryLibWebcam();
-    virtual ~CameraInterfaceFactoryLibWebcam();
-    virtual CameraInterface *createInterface();
-};
-
 }
 
 #endif // CAMERAINTERFACELIBWEBCAM_H

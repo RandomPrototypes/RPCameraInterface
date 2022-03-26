@@ -1,12 +1,14 @@
 #ifndef IMAGEDATA_H
 #define IMAGEDATA_H
 
+#include "RPCameraInterfaceDefs.h"
+
 #include "ImageFormat.h"
 
 namespace RPCameraInterface
 {
 
-class ImageData
+class RP_EXPORTS ImageData
 {
 public:
     ImageFormat imageFormat;
