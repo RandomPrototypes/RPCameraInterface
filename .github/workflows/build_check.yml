@@ -33,8 +33,7 @@ jobs:
           sudo apt -y install libopencv-dev
         elif [ "$RUNNER_OS" == "macOS" ]; then
           brew install pkg-config
-          brew install libav
-          brew install opencv
+          brew install ffmpeg
         fi
 
     - name: Configure CMake
