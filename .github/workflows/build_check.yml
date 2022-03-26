@@ -36,6 +36,7 @@ jobs:
     - name: Install libav and OpenCV
       if: runner.os == 'Windows'
       run: |
+        choco install opencv
         C:\msys64\usr\bin\wget.exe -O ${{github.workspace}}/ffmpeg.zip https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n5.0-latest-win64-gpl-shared-5.0.zip
         7z x ${{github.workspace}}/ffmpeg.zip -o"${{github.workspace}}"
         mv ${{github.workspace}}/ffmpeg-n5.0-latest-win64-gpl-shared-5.0 ${{github.workspace}}/ffmpeg
@@ -57,7 +58,7 @@ jobs:
     - name: Configure CMake
       if: runner.os == 'Windows'
       run: |
-        cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUSE_OPENCV=OFF -DFFMPEG_DIR=${{github.workspace}}/ffmpeg
+        cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUSE_OPENCV=ON -DFFMPEG_DIR=${{github.workspace}}/ffmpeg
 
     - name: Build
       # Build your program with the given configuration
