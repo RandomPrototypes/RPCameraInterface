@@ -36,7 +36,7 @@ jobs:
     - name: Install libav and OpenCV
       if: runner.os == 'Windows'
       run: |
-        C:\msys64\usr\bin\wget.exe -O ${{github.workspace}}/ffmpeg.zip https://github.com/BtbN/FFmpeg-Builds/archive/refs/tags/latest.zip
+        C:\msys64\usr\bin\wget.exe -O ${{github.workspace}}/ffmpeg.zip https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n5.0-latest-win64-gpl-shared-5.0.zip
         7z x ${{github.workspace}}/ffmpeg.zip
 
     - name: Install libav and OpenCV
