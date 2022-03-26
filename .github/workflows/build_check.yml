@@ -44,8 +44,8 @@ jobs:
         msbuild.exe INSTALL.vcxproj
         cd release
         cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/opencv/install -DWITH_CUDA=OFF ..
-        make
-        make install
+        cmake --build ${{github.workspace}}/opencv/release --config ${{env.BUILD_TYPE}}
+        cmake --install ${{github.workspace}}/opencv/release --config ${{env.BUILD_TYPE}}
         C:\msys64\usr\bin\wget.exe -O ${{github.workspace}}/ffmpeg.zip https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n5.0-latest-win64-gpl-shared-5.0.zip
         7z x ${{github.workspace}}/ffmpeg.zip -o"${{github.workspace}}"
         mv ${{github.workspace}}/ffmpeg-n5.0-latest-win64-gpl-shared-5.0 ${{github.workspace}}/ffmpeg
