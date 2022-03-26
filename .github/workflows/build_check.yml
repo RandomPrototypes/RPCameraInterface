@@ -62,12 +62,12 @@ jobs:
     - name: Configure CMake
       if: runner.os != 'Windows'
       run: |
-        cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUSE_OPENCV=ON -DOpenCV_DIR=${{github.workspace}}/opencv/install
+        cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUSE_OPENCV=ON
 
     - name: Configure CMake
       if: runner.os == 'Windows'
       run: |
-        cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUSE_OPENCV=ON -DFFMPEG_DIR=${{github.workspace}}/ffmpeg
+        cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUSE_OPENCV=ON -DFFMPEG_DIR=${{github.workspace}}/ffmpeg -DOpenCV_DIR=${{github.workspace}}/opencv/install
 
     - name: Build
       # Build your program with the given configuration
