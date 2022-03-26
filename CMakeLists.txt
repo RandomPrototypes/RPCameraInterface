@@ -140,13 +140,13 @@ if(BUILD_DEMO)
    target_link_libraries(RPCameraInterfaceDemo LINK_PUBLIC RPCameraInterface)
 endif()
 
-install(TARGETS RPCameraInterface  EXPORT RPCameraInterface-config
+install(TARGETS RPCameraInterface  EXPORT rpcamerainterface-config
     ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR})
-#install(TARGETS RPCameraInterface DESTINATION lib/ EXPORT RPCameraInterface-config)
+#install(TARGETS RPCameraInterface DESTINATION lib/ EXPORT rpcamerainterface-config)
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include DESTINATION . PATTERN "*.h")	
-install(EXPORT RPCameraInterface-config DESTINATION lib/cmake/RPCameraInterface)
-export(TARGETS RPCameraInterface FILE RPCameraInterface-config.cmake)
+install(EXPORT rpcamerainterface-config DESTINATION lib/cmake/RPCameraInterface)
+export(TARGETS RPCameraInterface FILE rpcamerainterface-config.cmake)
