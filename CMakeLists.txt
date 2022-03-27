@@ -16,12 +16,10 @@ option(BUILD_DEMO "Build DEMO" OFF)
 
 set(EXTERNAL_INSTALL_LOCATION deps)
 
-FetchContent_Populate(
-    BufferedSocket
-    GIT_REPOSITORY https://github.com/RandomPrototypes/BufferedSocket.git
-    GIT_TAG 46ce2df10989871628a83e69ce63480b5d6f8a90
-)
-SET(BufferedSocket ${bufferedsocket_SOURCE_DIR})
+find_package(BufferedSocket REQUIRED)
+message("BufferedSocket dir: ${BufferedSocket_DIR}")
+set(BufferedSocket_INCLUDE_DIR ${BufferedSocket_DIR}/../../../include)
+include_directories(${BufferedSocket_INCLUDE_DIR})
 
 if(WIN32)
    SET(FFMPEG_DIR "" CACHE STRING "ffmpeg dir")
@@ -53,8 +51,6 @@ set(LIB_SRC
 	src/ImageFormat.cpp
 	src/ImageFormatConverter.cpp
 	src/CameraInterfaceRPNetwork.cpp
-	${BufferedSocket}/BufferedSocket.h
-    ${BufferedSocket}/BufferedSocket.cpp
 )
 
 set(LIB_INCLUDE
@@ -97,18 +93,20 @@ endif()
 if(HAVE_V4L2)
 	message(STATUS "    V4L2      : YES")
 	set(LIB_SRC ${LIB_SRC} src/CameraInterfaceV4L2.cpp)
-    set(LIB_INCLUDE ${LIB_INCLUDE} include/RPCameraInterface/CameraInterfaceV4L2.h)
+   set(LIB_INCLUDE ${LIB_INCLUDE} include/RPCameraInterface/CameraInterfaceV4L2.h)
 else()
 	message(STATUS "    V4L2      : NO")
 endif()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${BufferedSocket})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_library(RPCameraInterface SHARED ${LIB_SRC} ${LIB_INCLUDE})
 target_compile_definitions(RPCameraInterface PRIVATE "RPCAMERAINTERFACE_EXPORTS")
 
 set_target_properties(RPCameraInterface PROPERTIES VERSION ${PROJECT_VERSION})
 #set_target_properties(RPCameraInterface PROPERTIES PUBLIC_HEADER ${LIB_INCLUDE})
+
+target_link_libraries(RPCameraInterface PRIVATE BufferedSocket)
 
 if(BUILD_DEMO)
    add_executable(RPCameraInterfaceDemo ${LIB_INCLUDE} demo/main.cpp)
