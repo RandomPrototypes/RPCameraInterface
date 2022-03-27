@@ -43,9 +43,9 @@ enum class VideoContainerType
     MP4
 };
 
-RP_EXPORTS std::string toString(ImageType type);
+RPCAM_EXPORTS std::string toString(ImageType type);
 
-class RP_EXPORTS ImageFormat
+class RPCAM_EXPORTS ImageFormat
 {
 public:
     int width, height;

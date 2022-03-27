@@ -207,7 +207,7 @@ std::string CameraEnumerator::getCameraDescription(const std::string& id)
     return "unknown";
 }
 
-RP_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends()
+RPCAM_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends()
 {
     std::vector<CaptureBackend> list;
     
@@ -222,7 +222,7 @@ RP_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends()
 	list.push_back(CaptureBackend::RPNetworkCamera);
     return list;
 }
-RP_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend backend)
+RPCAM_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend backend)
 {
 	if(backend == CaptureBackend::Any) {
 		std::vector<CaptureBackend> list = getAvailableCaptureBackends();
@@ -247,7 +247,7 @@ RP_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend 
 
     return std::shared_ptr<CameraEnumerator>();
 }
-RP_EXPORTS std::shared_ptr<CameraInterface> getCameraInterface(CaptureBackend backend)
+RPCAM_EXPORTS std::shared_ptr<CameraInterface> getCameraInterface(CaptureBackend backend)
 {
 	if(backend == CaptureBackend::Any) {
 		std::vector<CaptureBackend> list = getAvailableCaptureBackends();

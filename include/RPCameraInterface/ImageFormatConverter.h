@@ -17,7 +17,7 @@ extern "C" {
 namespace RPCameraInterface
 {
 
-class RP_EXPORTS ImageFormatConverter
+class RPCAM_EXPORTS ImageFormatConverter
 {
 public:
     ImageFormatConverter(ImageFormat srcFormat, ImageFormat dstFormat);
@@ -42,7 +42,7 @@ public:
     AVPixelFormat srcPixelFormat, dstPixelFormat;
 };
 
-AVPixelFormat RP_EXPORTS ImageTypeToAVPixelFormat(ImageType type);
+AVPixelFormat RPCAM_EXPORTS ImageTypeToAVPixelFormat(ImageType type);
 
 }
 

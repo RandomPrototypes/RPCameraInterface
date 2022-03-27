@@ -8,7 +8,7 @@
 namespace RPCameraInterface
 {
 
-class RP_EXPORTS ImageData
+class RPCAM_EXPORTS ImageData
 {
 public:
     ImageFormat imageFormat;

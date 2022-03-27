@@ -24,7 +24,7 @@ enum class CaptureBackend
     OpenCV,
 };
 
-class RP_EXPORTS CameraInfo
+class RPCAM_EXPORTS CameraInfo
 {
 public:
     std::string id;
@@ -32,7 +32,7 @@ public:
     std::string description;
 };
 
-class RP_EXPORTS CameraEnumeratorField
+class RPCAM_EXPORTS CameraEnumeratorField
 {
 public:
     std::string name;
@@ -44,7 +44,7 @@ public:
     CameraEnumeratorField(std::string name, std::string type, std::string text, std::string value = "");
 };
 
-class RP_EXPORTS CameraEnumerator
+class RPCAM_EXPORTS CameraEnumerator
 {
 public:
     CameraEnumerator(CaptureBackend backend);
@@ -65,7 +65,7 @@ public:
     std::vector<CameraEnumeratorField> listRequiredField;//first : field name, second : field type ("text", "number")
 };
 
-class RP_EXPORTS CameraInterface
+class RPCAM_EXPORTS CameraInterface
 {
 public:
     CameraInterface(CaptureBackend backend);
@@ -92,9 +92,9 @@ public:
     CaptureBackend backend;
 };
 
-RP_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends();
-RP_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend backend = CaptureBackend::Any);
-RP_EXPORTS std::shared_ptr<CameraInterface> getCameraInterface(CaptureBackend backend = CaptureBackend::Any);
+RPCAM_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends();
+RPCAM_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend backend = CaptureBackend::Any);
+RPCAM_EXPORTS std::shared_ptr<CameraInterface> getCameraInterface(CaptureBackend backend = CaptureBackend::Any);
 
 }//RPCameraInterface
 
