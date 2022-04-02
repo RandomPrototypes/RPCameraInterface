@@ -1,14 +1,14 @@
 #ifndef CAMERAINTERFACELIBWEBCAM_H
 #define CAMERAINTERFACELIBWEBCAM_H
 
-#include "CameraInterface.h"
+#include "CameraInterfaceBase.h"
 #include <sstream>
 #include <libwebcam/webcam.h>
 
 namespace RPCameraInterface
 {
 
-class CameraEnumeratorLibWebcam : public CameraEnumerator
+class CameraEnumeratorLibWebcam : public CameraEnumeratorBase
 {
 public:
     CameraEnumeratorLibWebcam();
@@ -17,18 +17,16 @@ public:
     virtual bool detectCameras();
 };
 
-class CameraInterfaceLibWebcam : public CameraInterface
+class CameraInterfaceLibWebcam : public CameraInterfaceBase
 {
 public:
     CameraInterfaceLibWebcam();
     ~CameraInterfaceLibWebcam();
-    virtual bool open(std::string params);
+    virtual bool open(const char *params);
     virtual bool close();
-    virtual std::vector<ImageFormat> getAvailableFormats();
     virtual void selectFormat(int formatId);
     virtual void selectFormat(ImageFormat format);
-    virtual std::shared_ptr<ImageData> getNewFrame(bool skipOldFrames);
-    virtual std::string getErrorMsg();
+    virtual const char *getErrorMsg();
 
     virtual bool startCapturing();
     virtual bool stopCapturing();

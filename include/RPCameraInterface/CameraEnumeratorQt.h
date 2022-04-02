@@ -1,12 +1,12 @@
 #ifndef CAMERAENUMERATORQT_H
 #define CAMERAENUMERATORQT_H
 
-#include "CameraInterface.h"
+#include "CameraInterfaceBase.h"
 
 namespace RPCameraInterface
 {
 
-class CameraEnumeratorQt : public CameraEnumerator
+class CameraEnumeratorQt : public CameraEnumeratorBase
 {
 public:
     CameraEnumeratorQt();

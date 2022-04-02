@@ -6,7 +6,7 @@ namespace RPCameraInterface
 {
 
 CameraEnumeratorLibWebcam::CameraEnumeratorLibWebcam()
-    :CameraEnumerator(CaptureBackend::LibWebcam)
+    :CameraEnumeratorBase(CaptureBackend::LibWebcam)
 {
     cameraType = "USB camera";
 }
@@ -73,6 +73,7 @@ bool CameraEnumeratorLibWebcam::detectCameras()
 }
 
 CameraInterfaceLibWebcam::CameraInterfaceLibWebcam()
+	:CameraInterfaceBase(CaptureBackend::LibWebcam)
 {
     listLibWebcamFormats = std::vector<webcam::format*>(static_cast<int>(ImageType::NB_FORMAT_TYPE), NULL);
     device = NULL;

@@ -1,7 +1,7 @@
 #ifndef CAMERAINTERFACEV4L2_H
 #define CAMERAINTERFACEV4L2_H
 
-#include "CameraInterface.h"
+#include "CameraInterfaceBase.h"
 #include <sstream>
 
 namespace RPCameraInterface
@@ -18,7 +18,7 @@ struct V4L2_buffer {
     size_t  length;
 };
 
-class CameraEnumeratorV4L2 : public CameraEnumerator
+class CameraEnumeratorV4L2 : public CameraEnumeratorBase
 {
 public:
     CameraEnumeratorV4L2();
@@ -27,23 +27,27 @@ public:
     virtual bool detectCameras();
 };
 
-class CameraInterfaceV4L2 : public CameraInterface
+class CameraInterfaceV4L2 : public CameraInterfaceBase
 {
 public:
     CameraInterfaceV4L2();
     ~CameraInterfaceV4L2();
-    virtual bool open(std::string params);
+    virtual bool open(const char *params);
     virtual bool close();
-    virtual std::vector<ImageFormat> getAvailableFormats();
     virtual void selectFormat(int formatId);
     virtual void selectPreviewFormat(int formatId);
     virtual void selectFormat(ImageFormat format);
     virtual void selectPreviewFormat(ImageFormat format);
-    virtual std::shared_ptr<ImageData> getNewFrame(bool skipOldFrames);
-    virtual std::string getErrorMsg();
+    virtual const char *getErrorMsg();
 
     virtual bool startCapturing();
     virtual bool stopCapturing();
+
+protected:
+	virtual ImageData *getNewFramePtr(bool skipOldFrames);
+	virtual size_t getAvailableFormatCount();
+	virtual ImageFormat getAvailableFormat(size_t id);
+
 private:
     bool initDevice();
     bool uninitDevice();
@@ -58,6 +62,7 @@ private:
     int fd;
     std::string dev_name;
     std::ostringstream errorMsg;
+    std::string errorMsgStr;
 
     int selectedFormat, selectedPreviewFormat;
 

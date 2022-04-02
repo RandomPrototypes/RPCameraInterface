@@ -125,21 +125,21 @@ bool ImageFormatConverter::convertImage(const std::shared_ptr<ImageData>& srcImg
     int total_size = dst_linesize[0] + dst_linesize[1] + dst_linesize[2] + dst_linesize[3];
     total_size *= dstFormat.height;
 
-    if(dstImg->dataSize != total_size)
+    if(dstImg->getDataSize() != total_size)
     {
-        if(dstImg->data != NULL && dstImg->releaseDataWhenDestroy)
+        if(dstImg->getDataPtr() != NULL && dstImg->isDataReleasedWhenDestroy())
             dstImg->freeData();
         dstImg->allocData(total_size);
-        dstImg->releaseDataWhenDestroy = true;
+        dstImg->setDataReleasedWhenDestroy(true);
     }
 
-    dstImg->imageFormat = dstFormat;
-    dstImg->timestamp = srcImg->timestamp;
+    dstImg->setImageFormat(dstFormat);
+    dstImg->setTimestamp(srcImg->getTimestamp());
 
     if(srcFormat.type == ImageType::JPG)
     {
-        pkt->size = srcImg->dataSize;
-        pkt->data = srcImg->data;
+        pkt->size = srcImg->getDataSize();
+        pkt->data = srcImg->getDataPtr();
 
         int got_picture;
 
@@ -174,20 +174,23 @@ bool ImageFormatConverter::convertImage(const std::shared_ptr<ImageData>& srcImg
 
         }
 
+		unsigned char *dstPtr = dstImg->getDataPtr();
         sws_scale(swsContext,
                   (const uint8_t * const *)&(frame->data[0]),
                   frame->linesize,
                   0,
-                  srcImg->imageFormat.height,
-                  (uint8_t* const*)&(dstImg->data),
+                  srcImg->getImageFormat().height,
+                  (uint8_t* const*)&dstPtr,
                   dst_linesize);
     } else {
+    	unsigned char *srcPtr = srcImg->getDataPtr();
+    	unsigned char *dstPtr = dstImg->getDataPtr();
         sws_scale(swsContext,
-                  (const uint8_t * const *)&(srcImg->data),
+                  (const uint8_t * const *)&srcPtr,
                   src_linesize,
                   0,
-                  srcImg->imageFormat.height,
-                  (uint8_t* const*)&(dstImg->data),
+                  srcImg->getImageFormat().height,
+                  (uint8_t* const*)&dstPtr,
                   dst_linesize);
     }
     return true;

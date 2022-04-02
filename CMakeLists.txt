@@ -47,18 +47,22 @@ endif()
 
 set(LIB_SRC
 	src/CameraInterface.cpp
+	src/CameraInterfaceBase.cpp
 	src/ImageData.cpp
 	src/ImageFormat.cpp
 	src/ImageFormatConverter.cpp
 	src/CameraInterfaceRPNetwork.cpp
+	src/PortableTypes.cpp
 )
 
 set(LIB_INCLUDE
 	include/RPCameraInterface/CameraInterface.h
+	include/RPCameraInterface/CameraInterfaceBase.h
 	include/RPCameraInterface/ImageData.h
 	include/RPCameraInterface/ImageFormat.h
 	include/RPCameraInterface/ImageFormatConverter.h
 	include/RPCameraInterface/CameraInterfaceRPNetwork.h
+	include/RPCameraInterface/PortableTypes.h
 )
 
 if(${USE_QT})

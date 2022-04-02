@@ -1,7 +1,7 @@
 #ifndef CAMERAINTERFACEDSHOW_H
 #define CAMERAINTERFACEDSHOW_H
 
-#include "CameraInterface.h"
+#include "CameraInterfaceBase.h"
 #include <sstream>
 
 namespace RPCameraInterface
@@ -20,7 +20,7 @@ public:
     static videoInput& getVideoInput();
 };
 
-class CameraEnumeratorDShow : public CameraEnumerator
+class CameraEnumeratorDShow : public CameraEnumeratorBase
 {
 public:
     CameraEnumeratorDShow();
@@ -29,21 +29,25 @@ public:
     virtual bool detectCameras();
 };
 
-class CameraInterfaceDShow : public CameraInterface
+class CameraInterfaceDShow : public CameraInterfaceBase
 {
 public:
     CameraInterfaceDShow();
     ~CameraInterfaceDShow();
-    virtual bool open(std::string params);
+    virtual bool open(const char *params);
     virtual bool close();
-    virtual std::vector<ImageFormat> getAvailableFormats();
     virtual void selectFormat(int formatId);
     virtual void selectFormat(ImageFormat format);
-    virtual std::shared_ptr<ImageData> getNewFrame(bool skipOldFrames);
-    virtual std::string getErrorMsg();
+    virtual const char *getErrorMsg();
 
     virtual bool startCapturing();
     virtual bool stopCapturing();
+
+protected:
+	virtual ImageData *getNewFramePtr(bool skipOldFrames);
+	virtual size_t getAvailableFormatCount();
+	virtual ImageFormat getAvailableFormat(size_t id);
+
 private:
     std::vector<ImageFormat> listFormats;
     std::vector<int> listFormatsFourcc;

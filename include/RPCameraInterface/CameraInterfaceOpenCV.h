@@ -1,29 +1,34 @@
 #ifndef CAMERAINTERFACEOPENCV_H
 #define CAMERAINTERFACEOPENCV_H
 
-#include "CameraInterface.h"
+#include "CameraInterfaceBase.h"
 #include <opencv2/opencv.hpp>
 
 namespace RPCameraInterface
 {
 
-class CameraInterfaceOpenCV : public CameraInterface
+class CameraInterfaceOpenCV : public CameraInterfaceBase
 {
 public:
     CameraInterfaceOpenCV();
     ~CameraInterfaceOpenCV();
-    virtual bool open(std::string params);
+    virtual bool open(const char *params);
     virtual bool close();
-    virtual std::vector<ImageFormat> getAvailableFormats();
     virtual void selectFormat(int formatId);
     virtual void selectFormat(ImageFormat format);
-    virtual std::shared_ptr<ImageData> getNewFrame(bool skipOldFrames);
-    virtual std::string getErrorMsg();
+    virtual const char *getErrorMsg();
 
     virtual bool startCapturing();
     virtual bool stopCapturing();
+
+protected:
+	virtual ImageData *getNewFramePtr(bool skipOldFrames);
+	virtual size_t getAvailableFormatCount();
+	virtual ImageFormat getAvailableFormat(size_t id);
+
 private:
     bool testResolution(int width, int height, bool use_mjpg);
+    void testAvailableFormats();
     std::vector<ImageFormat> listFormats;
     ImageFormat imageFormat;
     cv::VideoCapture *cap;

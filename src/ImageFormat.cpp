@@ -19,11 +19,11 @@ ImageFormat::ImageFormat(ImageType type, int width, int height, int fps)
 
 }
 
-std::string ImageFormat::toString()
+PortableString ImageFormat::toString()
 {
     std::ostringstream str;
     str << RPCameraInterface::toString(type) << ", " << width << "x" << height << ", " << fps << "fps";
-    return str.str();
+    return toPortableString(str.str());
 }
 
 }

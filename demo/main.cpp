@@ -13,18 +13,18 @@ int main()
     camEnum->detectCameras();
     printf("%d cameras detected\n", camEnum->count());
     for(int i = 0; i < camEnum->count(); i++) {
-        printf("%s: %s\n", camEnum->getCameraId(i).c_str(), camEnum->getCameraName(i).c_str());
+        printf("%s: %s\n", camEnum->getCameraId(i), camEnum->getCameraName(i));
     }
     
     if(cameraId < 0 || cameraId >= camEnum->count())
     	return 0;
 
 	//Obtain a camera interface using the same backend as the enumerator
-    std::shared_ptr<CameraInterface> cam = getCameraInterface(camEnum->backend);
+    std::shared_ptr<CameraInterface> cam = getCameraInterface(camEnum->getBackend());
     //Open the camera using the id from the enumerator
-    cam->open(camEnum->getCameraId(cameraId).c_str());
+    cam->open(camEnum->getCameraId(cameraId));
     //Get the list of available formats
-    std::vector<ImageFormat> listFormats = cam->getAvailableFormats();
+    std::vector<ImageFormat> listFormats = cam->getListAvailableFormat();
     for(ImageFormat& format : listFormats) {
         printf("%dx%d (%s)\n", format.width, format.height, toString(format.type).c_str());
     }
@@ -36,7 +36,7 @@ int main()
     ImageFormat dstFormat(ImageType::BGR24, 720, 480);
     ImageFormatConverter converter(ImageFormat(ImageType::JPG, 1920, 1080), dstFormat);
 
-    std::shared_ptr<ImageData> imgData2 = std::make_shared<ImageData>();
+    std::shared_ptr<ImageData> imgData2 = createImageData();
 
     while(true){
     	//Obtain the frame
@@ -44,7 +44,7 @@ int main()
         //Conver to the output format (BGR 720x480)
         converter.convertImage(imgData, imgData2);
         //Create OpenCV Mat for visualization
-        cv::Mat resultImg2(imgData2->imageFormat.height, imgData2->imageFormat.width, CV_8UC3, imgData2->data);
+        cv::Mat resultImg2(imgData2->getImageFormat().height, imgData2->getImageFormat().width, CV_8UC3, imgData2->getDataPtr());
         cv::imshow("img", resultImg2);
         cv::waitKey(10);
     }

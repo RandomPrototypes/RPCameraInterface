@@ -3,6 +3,7 @@
 
 #include <string>
 #include "RPCameraInterfaceDefs.h"
+#include "PortableTypes.h"
 
 namespace RPCameraInterface
 {
@@ -55,7 +56,7 @@ public:
     ImageFormat();
     ImageFormat(ImageType type, int width, int height, int fps = 0);
 
-    std::string toString();
+    PortableString toString();
 };
 
 }

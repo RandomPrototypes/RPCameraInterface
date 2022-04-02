@@ -1,14 +1,14 @@
 #ifndef CAMERAINTERFACERPNETWORK_H
 #define CAMERAINTERFACERPNETWORK_H
 
-#include "CameraInterface.h"
+#include "CameraInterfaceBase.h"
 #include "BufferedSocket.h"
 #include <sstream>
 
 namespace RPCameraInterface
 {
 
-class CameraEnumeratorRPNetwork : public CameraEnumerator
+class CameraEnumeratorRPNetwork : public CameraEnumeratorBase
 {
 public:
     CameraEnumeratorRPNetwork();
@@ -17,27 +17,33 @@ public:
     virtual bool detectCameras();
 };
 
-class CameraInterfaceRPNetwork : public CameraInterface
+class CameraInterfaceRPNetwork : public CameraInterfaceBase
 {
 public:
     CameraInterfaceRPNetwork();
     ~CameraInterfaceRPNetwork();
-    virtual bool open(std::string params);
+    virtual bool open(const char *params);
     virtual bool close();
-    virtual std::vector<ImageFormat> getAvailableFormats();
-    virtual std::vector<VideoCodecType> getAvailableVideoCodec();
-    virtual std::vector<VideoContainerType> getAvailableVideoContainer();
     virtual void selectFormat(ImageFormat format);
     virtual void selectVideoContainer(VideoContainerType container);
     virtual void selectVideoCodec(VideoCodecType codec);
-    virtual std::shared_ptr<ImageData> getNewFrame(bool skipOldFrames);
-    virtual std::string getErrorMsg();
+    virtual const char *getErrorMsg();
 
     virtual bool startCapturing();
     virtual bool stopCapturing();
     virtual bool hasRecordingCapability();
     virtual bool startRecording();
     virtual bool stopRecordingAndSaveToFile(std::string videoFilename, std::string timestampFilename);
+
+protected:
+	virtual ImageData *getNewFramePtr(bool skipOldFrames);
+	virtual size_t getAvailableFormatCount();
+	virtual ImageFormat getAvailableFormat(size_t id);
+	virtual size_t getAvailableVideoCodecCount();
+	virtual VideoCodecType getAvailableVideoCodec(size_t id);
+    virtual size_t getAvailableVideoContainerCount();
+    virtual VideoContainerType getAvailableVideoContainer(size_t id);
+
 private:
     bool syncTimestamp();
 
@@ -46,7 +52,7 @@ private:
     ImageFormat imageFormat;
     VideoCodecType videoCodecType;
     VideoContainerType videoContainerType;
-    BufferedSocket bufferedSock;
+    std::shared_ptr<BufferedSocket> bufferedSock;
     std::string errorMsg;
     int64_t timestampOffsetMs;
 };

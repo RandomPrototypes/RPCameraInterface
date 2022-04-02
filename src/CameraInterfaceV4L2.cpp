@@ -65,7 +65,7 @@ static int xioctl(int fh, int request, void *arg)
 }
 
 CameraEnumeratorV4L2::CameraEnumeratorV4L2()
-    :CameraEnumerator(CaptureBackend::V4L2)
+    :CameraEnumeratorBase(CaptureBackend::V4L2)
 {
     cameraType = "USB camera";
 }
@@ -123,7 +123,7 @@ bool CameraEnumeratorV4L2::detectCameras()
 
 
 CameraInterfaceV4L2::CameraInterfaceV4L2()
-	:CameraInterface(CaptureBackend::V4L2)
+	:CameraInterfaceBase(CaptureBackend::V4L2)
 {
     fd = -1;
     selectedFormat = -1;
@@ -163,7 +163,7 @@ void CameraInterfaceV4L2::process_image(const void *p, int size)
     }
 }
 
-bool CameraInterfaceV4L2::open(std::string params)
+bool CameraInterfaceV4L2::open(const char *params)
 {
     dev_name = params;
     struct stat st;
@@ -535,9 +535,16 @@ bool CameraInterfaceV4L2::close()
     return true;
 }
 
-std::vector<ImageFormat> CameraInterfaceV4L2::getAvailableFormats()
+size_t CameraInterfaceV4L2::getAvailableFormatCount()
 {   
-    return listImageFormats;
+    return listImageFormats.size();
+}
+
+ImageFormat CameraInterfaceV4L2::getAvailableFormat(size_t id)
+{
+	if(id < listImageFormats.size())
+    	return listImageFormats[id];
+    return ImageFormat();
 }
 
 void CameraInterfaceV4L2::requestImageFormatList()
@@ -703,7 +710,7 @@ int CameraInterfaceV4L2::read_frame()
     return 1;
 }
 
-std::shared_ptr<ImageData> CameraInterfaceV4L2::getNewFrame(bool skipOldFrames)
+ImageData *CameraInterfaceV4L2::getNewFramePtr(bool skipOldFrames)
 {
     while(true)
     {
@@ -724,31 +731,32 @@ std::shared_ptr<ImageData> CameraInterfaceV4L2::getNewFrame(bool skipOldFrames)
             if (EINTR == errno)
                 continue;
             errorMsg.clear();
-            return std::shared_ptr<ImageData>();
+            return NULL;
         }
 
         if (0 == r) {
             errorMsg.clear();
             errorMsg << "select timeout";
-            return std::shared_ptr<ImageData>();
+            return NULL;
         }
 
         int val = read_frame();
         if(val == 0)
             continue;
         if(val < 0)
-            return std::shared_ptr<ImageData>();
+            return NULL;
         else break;
     }
-    std::shared_ptr<ImageData> data = std::make_shared<ImageData>(imageFormat, (unsigned char*)lastFrameData, lastFrameDataLength, 0);
-    data->timestamp = getTimestampMs();
-    data->releaseDataWhenDestroy = false;
+    ImageData *data = createImageDataRawPtr(imageFormat, (unsigned char*)lastFrameData, lastFrameDataLength, 0);
+    data->setTimestamp(getTimestampMs());
+    data->setDataReleasedWhenDestroy(false);
     return data;
 }
 
-std::string CameraInterfaceV4L2::getErrorMsg()
+const char *CameraInterfaceV4L2::getErrorMsg()
 {
-    return errorMsg.str();
+	errorMsgStr = errorMsg.str();
+    return errorMsgStr.c_str();
 }
 
 }

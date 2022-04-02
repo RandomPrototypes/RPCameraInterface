@@ -24,7 +24,7 @@ videoInput& DShowVideoInput::getVideoInput()
 }
 
 CameraEnumeratorDShow::CameraEnumeratorDShow()
-    :CameraEnumerator(CaptureBackend::DShow)
+    :CameraEnumeratorBase(CaptureBackend::DShow)
 {
     cameraType = "USB camera";
 }
@@ -50,7 +50,7 @@ bool CameraEnumeratorDShow::detectCameras()
 }
 
 CameraInterfaceDShow::CameraInterfaceDShow()
-    :CameraInterface(CaptureBackend::DShow)
+    :CameraInterfaceBase(CaptureBackend::DShow)
 {
     cameraId = -1;
 }
@@ -131,9 +131,15 @@ bool CameraInterfaceDShow::close()
     cameraId = -1;
     return true;
 }
-std::vector<ImageFormat> CameraInterfaceDShow::getAvailableFormats()
+size_t CameraInterfaceDShow::getAvailableFormatCount()
 {
-    return listFormats;
+    return listFormats.size();
+}
+ImageFormat CameraInterfaceDShow::getAvailableFormat(size_t id)
+{
+	if(id < listFormats.size())
+    	return listFormats[id];
+    return ImageFormat();
 }
 void CameraInterfaceDShow::selectFormat(int formatId)
 {
@@ -143,18 +149,19 @@ void CameraInterfaceDShow::selectFormat(ImageFormat format)
 {
     imageFormat = format;
 }
-std::shared_ptr<ImageData> CameraInterfaceDShow::getNewFrame(bool skipOldFrames)
+ImageData *CameraInterfaceDShow::getNewFramePtr(bool skipOldFrames)
 {
     videoInput& g_VI = DShowVideoInput::getVideoInput();
     int w = g_VI.getWidth(cameraId), h = g_VI.getHeight(cameraId);
     bool convertRGB = g_VI.getConvertRGB(cameraId);
 
-    std::shared_ptr<ImageData> data = std::make_shared<ImageData>();
-    data->releaseDataWhenDestroy = false;
-    data->timestamp = getTimestampMs();
-    data->imageFormat.type = ImageType::JPG;
+    ImageData *data = createImageDataRawPtr();
+    data->setDataReleasedWhenDestroy(false);
+    data->setTimestamp(getTimestampMs());
+    /*data->imageFormat.type = ImageType::JPG;
     data->imageFormat.width = imageFormat.width;
-    data->imageFormat.height = imageFormat.height;
+    data->imageFormat.height = imageFormat.height;*/
+    data->setImageFormat(imageFormat);
 
     data->data = g_VI.getRawPixels(cameraId, &(data->dataSize));
     return data;

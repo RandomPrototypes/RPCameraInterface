@@ -5,7 +5,7 @@ namespace RPCameraInterface
 {
 
 CameraInterfaceOpenCV::CameraInterfaceOpenCV()
-    :CameraInterface(CaptureBackend::OpenCV)
+    :CameraInterfaceBase(CaptureBackend::OpenCV)
 {
     cap = NULL;
 }
@@ -18,7 +18,7 @@ CameraInterfaceOpenCV::~CameraInterfaceOpenCV()
     }
 }
 
-bool CameraInterfaceOpenCV::open(std::string params)
+bool CameraInterfaceOpenCV::open(const char *params)
 {
     cap = new cv::VideoCapture(std::stoi(params), cv::CAP_DSHOW);
     if(!cap->isOpened()) {
@@ -59,7 +59,8 @@ bool CameraInterfaceOpenCV::close()
     cap = NULL;
     return true;
 }
-std::vector<ImageFormat> CameraInterfaceOpenCV::getAvailableFormats()
+
+void CameraInterfaceOpenCV::testAvailableFormats()
 {
     std::vector<cv::Size> listSizeToTest = {cv::Size(320,240), cv::Size(640,480), cv::Size(1280,720), cv::Size(1920,1080),
                                             cv::Size(3840,2160), cv::Size(4096,2160)};
@@ -75,12 +76,29 @@ std::vector<ImageFormat> CameraInterfaceOpenCV::getAvailableFormats()
         if(testResolution(size.width, size.height, true))
             list.push_back(format);
     }
-    return list;
+    listFormats = list;
 }
+
+size_t CameraInterfaceOpenCV::getAvailableFormatCount()
+{
+	if(listFormats.size() == 0)
+		testAvailableFormats();
+	return listFormats.size();
+}
+
+ImageFormat CameraInterfaceOpenCV::getAvailableFormat(size_t id)
+{
+	if(listFormats.size() == 0)
+		testAvailableFormats();
+	if(id < listFormats.size())
+		return listFormats[id];
+	return ImageFormat();
+}
+	
 void CameraInterfaceOpenCV::selectFormat(int formatId)
 {
     if(listFormats.size() == 0)
-        listFormats = getAvailableFormats();
+        testAvailableFormats();
     if(formatId < listFormats.size())
         imageFormat = listFormats[formatId];
 }
@@ -88,26 +106,26 @@ void CameraInterfaceOpenCV::selectFormat(ImageFormat format)
 {
     imageFormat = format;
 }
-std::shared_ptr<ImageData> CameraInterfaceOpenCV::getNewFrame(bool skipOldFrames)
+ImageData *CameraInterfaceOpenCV::getNewFramePtr(bool skipOldFrames)
 {
     if(cap != NULL)
     {
         *cap >> frame;
-        std::shared_ptr<ImageData> data = std::make_shared<ImageData>();
-        data->releaseDataWhenDestroy = false;
-        data->timestamp = getTimestampMs();
-        data->imageFormat.type = ImageType::BGR24;
-        data->imageFormat.width = frame.cols;
-        data->imageFormat.height = frame.rows;
-        data->data = const_cast<unsigned char*>(frame.data);
-        data->dataSize = frame.rows*frame.cols*3;
+        ImageData *data = createImageDataRawPtr();
+        data->setDataReleasedWhenDestroy(false);
+        data->setTimestamp(getTimestampMs());
+        data->getImageFormat().type = ImageType::BGR24;
+        data->getImageFormat().width = frame.cols;
+        data->getImageFormat().height = frame.rows;
+        data->setDataPtr(const_cast<unsigned char*>(frame.data));
+        data->setDataSize(frame.rows*frame.cols*3);
         return data;
     }
-    return std::shared_ptr<ImageData>();
+    return NULL;
 }
-std::string CameraInterfaceOpenCV::getErrorMsg()
+const char *CameraInterfaceOpenCV::getErrorMsg()
 {
-    return errorMsg;
+    return errorMsg.c_str();
 }
 
 bool CameraInterfaceOpenCV::startCapturing()
