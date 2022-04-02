@@ -99,7 +99,7 @@ ImageType toImageType(const std::string& guid)
     }
 }
 
-bool CameraInterfaceDShow::open(std::string params)
+bool CameraInterfaceDShow::open(const char *params)
 {
     videoInput& g_VI = DShowVideoInput::getVideoInput();
     try {
@@ -163,12 +163,14 @@ ImageData *CameraInterfaceDShow::getNewFramePtr(bool skipOldFrames)
     data->imageFormat.height = imageFormat.height;*/
     data->setImageFormat(imageFormat);
 
-    data->data = g_VI.getRawPixels(cameraId, &(data->dataSize));
+	int size;
+    data->setDataPtr(g_VI.getRawPixels(cameraId, &size));
+    data->setDataSize(size);
     return data;
 }
-std::string CameraInterfaceDShow::getErrorMsg()
+const char *CameraInterfaceDShow::getErrorMsg()
 {
-    return errorMsg;
+    return errorMsg.c_str();
 }
 
 bool CameraInterfaceDShow::startCapturing()
