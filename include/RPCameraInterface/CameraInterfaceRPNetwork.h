@@ -1,8 +1,8 @@
 #ifndef CAMERAINTERFACERPNETWORK_H
 #define CAMERAINTERFACERPNETWORK_H
 
-#include "CameraInterfaceBase.h"
-#include "BufferedSocket.h"
+#include <RPCameraInterface/CameraInterfaceBase.h>
+#include <BufferedSocket/BufferedSocket.h>
 #include <sstream>
 
 namespace RPCameraInterface

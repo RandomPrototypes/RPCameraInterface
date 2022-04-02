@@ -1,7 +1,7 @@
 #include <RPCameraInterface/CameraInterfaceRPNetwork.h>
 //#include <QDebug>
 #include <string.h>
-#include <DataPacket.h>
+#include <BufferedSocket/DataPacket.h>
 
 namespace RPCameraInterface
 {
