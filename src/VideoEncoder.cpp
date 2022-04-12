@@ -99,8 +99,10 @@ bool H264EncoderImpl::open(const char *filename, int height, int width, int fps,
     codecContext->width = width;
     codecContext->height = height;
     /* frames per second */
-    codecContext->time_base= (AVRational){1,fps};
-    codecContext->framerate= (AVRational){fps,1};
+    codecContext->time_base.num = 1;
+    codecContext->time_base.den  = fps;
+    codecContext->framerate.num = fps;
+    codecContext->framerate.den = 1;
     codecContext->gop_size = 10; /* emit one intra frame every ten frames */
     codecContext->max_b_frames=1;
     codecContext->pix_fmt = AV_PIX_FMT_YUV420P;
