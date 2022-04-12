@@ -38,11 +38,11 @@ bool encode(AVCodecContext *enc_ctx, AVFrame *frame, AVPacket *pkt, FILE *outfil
     return true;
 }
 
-class RPCAM_EXPORTS VideoEncoderImpl : public VideoEncoder
+class RPCAM_EXPORTS H264EncoderImpl : public H264Encoder
 {
 public:
-	VideoEncoderImpl();
-	virtual ~VideoEncoderImpl();
+	H264EncoderImpl();
+	virtual ~H264EncoderImpl();
     virtual bool open(const char *filename, int height, int width, int fps = 30, int bitrate = 2000000, const char *preset = "fast");
     virtual bool write(const std::shared_ptr<ImageData>& img);
     virtual void release();
@@ -56,23 +56,23 @@ private:
     int nbEncodedFrames;
 };
 
-VideoEncoder::~VideoEncoder()
+H264Encoder::~H264Encoder()
 {
 }
 
-VideoEncoderImpl::VideoEncoderImpl()
+H264EncoderImpl::H264EncoderImpl()
 {
 	codecContext = NULL;
 	sws_context = NULL;
 }
 
-VideoEncoderImpl::~VideoEncoderImpl()
+H264EncoderImpl::~H264EncoderImpl()
 {
 	if(codecContext != NULL)
 		release();
 }
 
-bool VideoEncoderImpl::open(const char *filename, int height, int width, int fps, int bitrate, const char *preset)
+bool H264EncoderImpl::open(const char *filename, int height, int width, int fps, int bitrate, const char *preset)
 {
     nbEncodedFrames = 0;
     codec = avcodec_find_encoder(AV_CODEC_ID_H264);//avcodec_find_encoder_by_name("mpeg4");
@@ -137,7 +137,7 @@ bool VideoEncoderImpl::open(const char *filename, int height, int width, int fps
     return true;
 }
 
-bool VideoEncoderImpl::write(const std::shared_ptr<ImageData>& img)
+bool H264EncoderImpl::write(const std::shared_ptr<ImageData>& img)
 {
     int ret = av_frame_make_writable(frame);
     if (ret < 0)
@@ -164,7 +164,7 @@ bool VideoEncoderImpl::write(const std::shared_ptr<ImageData>& img)
     return true;
 }
 
-void VideoEncoderImpl::release()
+void H264EncoderImpl::release()
 {
 
     /* flush the encoder */
@@ -182,14 +182,14 @@ void VideoEncoderImpl::release()
     sws_context = NULL;
 }
 
-RPCAM_EXPORTS VideoEncoder *createVideoEncoderRawPtr()
+RPCAM_EXPORTS H264Encoder *createH264EncoderRawPtr()
 {
-	return new VideoEncoderImpl();
+	return new H264EncoderImpl();
 }
 
-RPCAM_EXPORTS void deleteVideoEncoderRawPtr(VideoEncoder *videoEncoder)
+RPCAM_EXPORTS void deleteH264EncoderRawPtr(H264Encoder *h264Encoder)
 {
-	delete videoEncoder;
+	delete h264Encoder;
 }
 
 }
