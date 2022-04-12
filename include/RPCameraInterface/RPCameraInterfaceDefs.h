@@ -1,5 +1,4 @@
-#ifndef RPCAMERAINTERFACEDEFS_H
-#define RPCAMERAINTERFACEDEFS_H
+#pragma once
 
 //Taken from OpenCV
 
@@ -17,6 +16,4 @@
 
 #ifndef RPCAM_EXPORTS
 # define RPCAM_EXPORTS
-#endif
-
 #endif

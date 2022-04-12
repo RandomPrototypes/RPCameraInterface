@@ -1,5 +1,4 @@
-#ifndef IMAGEDATA_H
-#define IMAGEDATA_H
+#pragma once
 
 #include "RPCameraInterfaceDefs.h"
 #include "ImageFormat.h"
@@ -39,5 +38,3 @@ inline std::shared_ptr<ImageData> createImageData(ImageFormat imageFormat = Imag
 }
 
 }
-
-#endif // IMAGEDATA_H

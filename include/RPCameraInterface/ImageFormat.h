@@ -1,5 +1,4 @@
-#ifndef IMAGEFORMAT_H
-#define IMAGEFORMAT_H
+#pragma once
 
 #include <string>
 #include "RPCameraInterfaceDefs.h"
@@ -60,5 +59,3 @@ public:
 };
 
 }
-
-#endif // IMAGEFORMAT_H

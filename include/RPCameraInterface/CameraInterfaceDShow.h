@@ -1,5 +1,4 @@
-#ifndef CAMERAINTERFACEDSHOW_H
-#define CAMERAINTERFACEDSHOW_H
+#pragma once
 
 #include "CameraInterfaceBase.h"
 #include <sstream>
@@ -57,5 +56,3 @@ private:
 };
 
 }
-
-#endif // CAMERAINTERFACEDSHOW_H

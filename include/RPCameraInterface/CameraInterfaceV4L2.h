@@ -1,5 +1,4 @@
-#ifndef CAMERAINTERFACEV4L2_H
-#define CAMERAINTERFACEV4L2_H
+#pragma once
 
 #include "CameraInterfaceBase.h"
 #include <sstream>
@@ -82,5 +81,3 @@ private:
 };
 
 }
-
-#endif // CAMERAINTERFACEV4L2_H

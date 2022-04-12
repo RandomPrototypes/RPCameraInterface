@@ -1,5 +1,4 @@
-#ifndef IMAGEFORMATCONVERTER_HPP
-#define IMAGEFORMATCONVERTER_HPP
+#pragma once
 
 #include <memory>
 #include "ImageFormat.h"
@@ -45,5 +44,3 @@ public:
 AVPixelFormat RPCAM_EXPORTS ImageTypeToAVPixelFormat(ImageType type);
 
 }
-
-#endif // IMAGEFORMATCONVERTER_HPP

@@ -1,5 +1,4 @@
-#ifndef CAMERAINTERFACELIBWEBCAM_H
-#define CAMERAINTERFACELIBWEBCAM_H
+#pragma once
 
 #include "CameraInterfaceBase.h"
 #include <sstream>
@@ -42,5 +41,3 @@ private:
 };
 
 }
-
-#endif // CAMERAINTERFACELIBWEBCAM_H

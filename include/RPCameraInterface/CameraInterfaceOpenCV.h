@@ -1,5 +1,4 @@
-#ifndef CAMERAINTERFACEOPENCV_H
-#define CAMERAINTERFACEOPENCV_H
+#pragma once
 
 #include "CameraInterfaceBase.h"
 #include <opencv2/opencv.hpp>
@@ -38,5 +37,3 @@ private:
 };
 
 }
-
-#endif // CAMERAINTERFACELIBWEBCAM_H

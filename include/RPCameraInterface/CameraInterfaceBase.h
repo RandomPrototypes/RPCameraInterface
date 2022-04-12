@@ -1,5 +1,4 @@
-#ifndef CAMERAINTERFACEBASE_H
-#define CAMERAINTERFACEBASE_H
+#pragma once
 
 #include "CameraInterface.h"
 
@@ -82,5 +81,3 @@ protected:
 };
 
 }//RPCameraInterface
-
-#endif // CAMERAINTERFACE_H

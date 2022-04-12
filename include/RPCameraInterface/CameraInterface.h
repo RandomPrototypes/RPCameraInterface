@@ -1,5 +1,4 @@
-#ifndef CAMERAINTERFACE_H
-#define CAMERAINTERFACE_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -113,5 +112,3 @@ inline std::vector<VideoContainerType> CameraInterface::getListAvailableVideoCon
 }
 
 }//RPCameraInterface
-
-#endif // CAMERAINTERFACE_H

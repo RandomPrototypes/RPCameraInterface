@@ -1,5 +1,4 @@
-#ifndef CAMERAENUMERATORQT_H
-#define CAMERAENUMERATORQT_H
+#pragma once
 
 #include "CameraInterfaceBase.h"
 
@@ -16,5 +15,3 @@ public:
 };
 
 }
-
-#endif // CAMERAENUMERATORQT_H

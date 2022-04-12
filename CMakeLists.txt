@@ -51,6 +51,7 @@ set(LIB_SRC
 	src/ImageData.cpp
 	src/ImageFormat.cpp
 	src/ImageFormatConverter.cpp
+	src/VideoEncoder.cpp
 	src/CameraInterfaceRPNetwork.cpp
 	src/PortableTypes.cpp
 )
@@ -61,6 +62,7 @@ set(LIB_INCLUDE
 	include/RPCameraInterface/ImageData.h
 	include/RPCameraInterface/ImageFormat.h
 	include/RPCameraInterface/ImageFormatConverter.h
+	include/RPCameraInterface/VideoEncoder.h
 	include/RPCameraInterface/CameraInterfaceRPNetwork.h
 	include/RPCameraInterface/PortableTypes.h
 )

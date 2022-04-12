@@ -1,5 +1,4 @@
-#ifndef CAMERAINTERFACERPNETWORK_H
-#define CAMERAINTERFACERPNETWORK_H
+#pragma once
 
 #include <RPCameraInterface/CameraInterfaceBase.h>
 #include <BufferedSocket/BufferedSocket.h>
@@ -58,5 +57,3 @@ private:
 };
 
 }
-
-#endif // CAMERAINTERFACEANDROID_H
