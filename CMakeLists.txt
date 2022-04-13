@@ -65,6 +65,7 @@ set(LIB_INCLUDE
 	include/RPCameraInterface/VideoEncoder.h
 	include/RPCameraInterface/CameraInterfaceRPNetwork.h
 	include/RPCameraInterface/PortableTypes.h
+	include/RPCameraInterface/OpenCVConverter.h
 )
 
 if(${USE_QT})
