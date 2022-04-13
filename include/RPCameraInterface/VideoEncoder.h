@@ -25,6 +25,7 @@ public:
     virtual bool open(const char *filename, int height, int width, int fps = 30, int bitrate = 2000000, const char *preset = "fast") = 0;
     virtual bool write(const std::shared_ptr<ImageData>& img) = 0;
     virtual void release() = 0;
+    virtual void setUseFrameTimestamp(bool useFrameTimestamp) = 0;
 };
 
 extern "C" {

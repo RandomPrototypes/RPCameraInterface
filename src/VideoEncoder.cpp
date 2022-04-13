@@ -47,6 +47,7 @@ public:
     virtual bool open(const char *filename, int height, int width, int fps = 30, int bitrate = 2000000, const char *preset = "fast");
     virtual bool write(const std::shared_ptr<ImageData>& img);
     virtual void release();
+    virtual void setUseFrameTimestamp(bool useFrameTimestamp);
 private:
     const AVCodec *codec;
     AVCodecContext *codecContext;
@@ -55,6 +56,9 @@ private:
     FILE *file;
     AVFrame *frame;
     int nbEncodedFrames;
+    bool useFrameTimestamp;
+    int fps;
+    uint64_t firstFrameTimestamp;
 };
 
 H264Encoder::~H264Encoder()
@@ -65,6 +69,8 @@ H264EncoderImpl::H264EncoderImpl()
 {
 	codecContext = NULL;
 	sws_context = NULL;
+    useFrameTimestamp = false;
+    fps = 30;
 }
 
 H264EncoderImpl::~H264EncoderImpl()
@@ -73,9 +79,15 @@ H264EncoderImpl::~H264EncoderImpl()
 		release();
 }
 
+void H264EncoderImpl::setUseFrameTimestamp(bool useFrameTimestamp)
+{
+    this->useFrameTimestamp = useFrameTimestamp;
+}
+
 bool H264EncoderImpl::open(const char *filename, int height, int width, int fps, int bitrate, const char *preset)
 {
     nbEncodedFrames = 0;
+    this->fps = fps;
     codec = avcodec_find_encoder(AV_CODEC_ID_H264);//avcodec_find_encoder_by_name("mpeg4");
     if (!codec) {
         printf("Codec not found\n");
@@ -100,8 +112,8 @@ bool H264EncoderImpl::open(const char *filename, int height, int width, int fps,
     codecContext->width = width;
     codecContext->height = height;
     /* frames per second */
-    codecContext->time_base.num = 1;
-    codecContext->time_base.den  = fps;
+    codecContext->time_base.num = 1000;
+    codecContext->time_base.den  = 1000*fps;
     codecContext->framerate.num = fps;
     codecContext->framerate.den = 1;
     codecContext->gop_size = 10; /* emit one intra frame every ten frames */
@@ -155,7 +167,13 @@ bool H264EncoderImpl::write(const std::shared_ptr<ImageData>& img)
     sws_scale(sws_context, (const uint8_t * const *)&data, in_linesize, 0,
             codecContext->height, frame->data, frame->linesize);
 
-    frame->pts = nbEncodedFrames;
+    if(useFrameTimestamp) {
+        if(nbEncodedFrames == 0)
+            firstFrameTimestamp = img->getTimestamp();
+        frame->pts = (img->getTimestamp() - firstFrameTimestamp) * fps;
+    } else {
+        frame->pts = nbEncodedFrames * 1000;
+    }
 
     if(!encode(codecContext, frame, pkt, file))
     {

@@ -17,8 +17,8 @@ public:
     virtual const ImageFormat& getImageFormat() const = 0;
     virtual ImageFormat& getImageFormat() = 0;
     virtual void setImageFormat(ImageFormat format) = 0;
-    virtual uint64_t getTimestamp() const = 0;
-    virtual void setTimestamp(uint64_t timestamp) = 0;
+    virtual uint64_t getTimestamp() const = 0;//get timestamp in ms
+    virtual void setTimestamp(uint64_t timestamp) = 0;//set timestamp in ms
     virtual unsigned char *getDataPtr() const = 0;
     virtual void setDataPtr(unsigned char *dataPtr) = 0;
     virtual int getDataSize() const = 0;
