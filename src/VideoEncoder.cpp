@@ -1,4 +1,5 @@
 #include <RPCameraInterface/VideoEncoder.h>
+#include <RPCameraInterface/ImageFormatConverter.h>
 #include <stdio.h>
 
 namespace RPCameraInterface
@@ -22,7 +23,7 @@ bool encode(AVCodecContext *enc_ctx, AVFrame *frame, AVPacket *pkt, FILE *outfil
         ret = avcodec_receive_packet(enc_ctx, pkt);
         if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
         {
-            printf("AVERROR(EAGAIN), AVERROR_EOF\n");
+            //printf("AVERROR(EAGAIN), AVERROR_EOF\n");
             return true;
         }
         else if (ret < 0) {
@@ -147,7 +148,7 @@ bool H264EncoderImpl::write(const std::shared_ptr<ImageData>& img)
 
     const int in_linesize[1] = { 3 * codecContext->width };
     sws_context = sws_getCachedContext(sws_context,
-                codecContext->width, codecContext->height, AV_PIX_FMT_BGR24,
+                codecContext->width, codecContext->height, ImageTypeToAVPixelFormat(img->getImageFormat().type),
                 codecContext->width, codecContext->height, AV_PIX_FMT_YUV420P,
                 0, 0, 0, 0);
     unsigned char *data = img->getDataPtr();
