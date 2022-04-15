@@ -18,24 +18,24 @@ namespace RPCameraInterface
 {
 
 //based on https://ffmpeg.org/doxygen/trunk/encode_video_8c-example.html
-class RPCAM_EXPORTS H264Encoder
+class RPCAM_EXPORTS VideoEncoder
 {
 public:
-	virtual ~H264Encoder();
-    virtual bool open(const char *filename, int height, int width, int fps = 30, int bitrate = 2000000, const char *preset = "fast") = 0;
+	virtual ~VideoEncoder();
+    virtual bool open(const char *filename, int height, int width, int fps = 30, const char *encoderName = "", int bitrate = 2000000, const char *preset = "fast") = 0;
     virtual bool write(const std::shared_ptr<ImageData>& img) = 0;
     virtual void release() = 0;
     virtual void setUseFrameTimestamp(bool useFrameTimestamp) = 0;
 };
 
 extern "C" {
-	RPCAM_EXPORTS H264Encoder *createH264EncoderRawPtr();
-	RPCAM_EXPORTS void deleteH264EncoderRawPtr(H264Encoder *h264Encoder);
+	RPCAM_EXPORTS VideoEncoder *createVideoEncoderRawPtr();
+	RPCAM_EXPORTS void deleteVideoEncoderRawPtr(VideoEncoder *videoEncoder);
 }
 
-inline std::shared_ptr<H264Encoder> createH264Encoder()
+inline std::shared_ptr<VideoEncoder> createVideoEncoder()
 {
-	return std::shared_ptr<H264Encoder>(createH264EncoderRawPtr(), deleteH264EncoderRawPtr);
+	return std::shared_ptr<VideoEncoder>(createVideoEncoderRawPtr(), deleteVideoEncoderRawPtr);
 }
 
 }

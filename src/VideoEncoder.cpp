@@ -11,7 +11,7 @@ bool encode(AVCodecContext *enc_ctx, AVFrame *frame, AVPacket *pkt, FILE *outfil
 
     /* send the frame to the encoder */
     if (frame)
-        ;//printf("Send frame %ld\n", frame->pts);
+        printf("Send frame %ld\n", frame->pts);
 
     ret = avcodec_send_frame(enc_ctx, frame);
     if (ret < 0) {
@@ -31,7 +31,7 @@ bool encode(AVCodecContext *enc_ctx, AVFrame *frame, AVPacket *pkt, FILE *outfil
             return false;
         }
 
-        //printf("Write packet %ld (size=%5d)\n", pkt->pts, pkt->size);
+        printf("Write packet %ld (size=%5d)\n", pkt->pts, pkt->size);
         fwrite(pkt->data, 1, pkt->size, outfile);
         av_packet_unref(pkt);
     }
@@ -39,12 +39,12 @@ bool encode(AVCodecContext *enc_ctx, AVFrame *frame, AVPacket *pkt, FILE *outfil
     return true;
 }
 
-class RPCAM_EXPORTS H264EncoderImpl : public H264Encoder
+class RPCAM_EXPORTS VideoEncoderImpl : public VideoEncoder
 {
 public:
-	H264EncoderImpl();
-	virtual ~H264EncoderImpl();
-    virtual bool open(const char *filename, int height, int width, int fps = 30, int bitrate = 2000000, const char *preset = "fast");
+	VideoEncoderImpl();
+	virtual ~VideoEncoderImpl();
+    virtual bool open(const char *filename, int height, int width, int fps = 30, const char *encoderName = "", int bitrate = 2000000, const char *preset = "fast");
     virtual bool write(const std::shared_ptr<ImageData>& img);
     virtual void release();
     virtual void setUseFrameTimestamp(bool useFrameTimestamp);
@@ -61,11 +61,11 @@ private:
     uint64_t firstFrameTimestamp;
 };
 
-H264Encoder::~H264Encoder()
+VideoEncoder::~VideoEncoder()
 {
 }
 
-H264EncoderImpl::H264EncoderImpl()
+VideoEncoderImpl::VideoEncoderImpl()
 {
 	codecContext = NULL;
 	sws_context = NULL;
@@ -73,22 +73,39 @@ H264EncoderImpl::H264EncoderImpl()
     fps = 30;
 }
 
-H264EncoderImpl::~H264EncoderImpl()
+VideoEncoderImpl::~VideoEncoderImpl()
 {
 	if(codecContext != NULL)
 		release();
 }
 
-void H264EncoderImpl::setUseFrameTimestamp(bool useFrameTimestamp)
+void VideoEncoderImpl::setUseFrameTimestamp(bool useFrameTimestamp)
 {
     this->useFrameTimestamp = useFrameTimestamp;
 }
 
-bool H264EncoderImpl::open(const char *filename, int height, int width, int fps, int bitrate, const char *preset)
+bool VideoEncoderImpl::open(const char *filename, int height, int width, int fps, const char *encoderName, int bitrate, const char *preset)
 {
     nbEncodedFrames = 0;
     this->fps = fps;
-    codec = avcodec_find_encoder(AV_CODEC_ID_H264);//avcodec_find_encoder_by_name("mpeg4");
+    const char *ext = strrchr(filename, '.');
+    if(strlen(encoderName) > 0) {
+        codec = avcodec_find_encoder_by_name(encoderName);
+    } else if(ext == NULL) {
+        printf("Can not find file extension\n");
+        return false;
+    } else if(!strcmp(ext, ".mp4")) {
+        codec = avcodec_find_encoder_by_name("mpeg4");
+    } else if(!strcmp(ext, ".mp2")) {
+        codec = avcodec_find_encoder(AV_CODEC_ID_MPEG2VIDEO);
+    } else if(!strcmp(ext, ".mpg") || !strcmp(ext, ".mpeg")) {
+        codec = avcodec_find_encoder(AV_CODEC_ID_MPEG1VIDEO);
+    } else if(!strcmp(ext, ".h264") || !strcmp(ext, ".264")) {
+        codec = avcodec_find_encoder(AV_CODEC_ID_H264);
+    } else {
+        printf("Unknown file extension: %s\n", ext);
+        return false;
+    }
     if (!codec) {
         printf("Codec not found\n");
         return false;
@@ -112,8 +129,8 @@ bool H264EncoderImpl::open(const char *filename, int height, int width, int fps,
     codecContext->width = width;
     codecContext->height = height;
     /* frames per second */
-    codecContext->time_base.num = 1000;
-    codecContext->time_base.den  = 1000*fps;
+    codecContext->time_base.num = 1;
+    codecContext->time_base.den  = fps;
     codecContext->framerate.num = fps;
     codecContext->framerate.den = 1;
     codecContext->gop_size = 10; /* emit one intra frame every ten frames */
@@ -152,7 +169,7 @@ bool H264EncoderImpl::open(const char *filename, int height, int width, int fps,
     return true;
 }
 
-bool H264EncoderImpl::write(const std::shared_ptr<ImageData>& img)
+bool VideoEncoderImpl::write(const std::shared_ptr<ImageData>& img)
 {
     int ret = av_frame_make_writable(frame);
     if (ret < 0)
@@ -170,10 +187,12 @@ bool H264EncoderImpl::write(const std::shared_ptr<ImageData>& img)
     if(useFrameTimestamp) {
         if(nbEncodedFrames == 0)
             firstFrameTimestamp = img->getTimestamp();
-        frame->pts = (img->getTimestamp() - firstFrameTimestamp) * fps;
+        frame->pts = static_cast<int64_t>(static_cast<double>(img->getTimestamp() - firstFrameTimestamp) * fps / 1000 + 0.5);
     } else {
-        frame->pts = nbEncodedFrames * 1000;
+        frame->pts = nbEncodedFrames;
     }
+    //frame->pkt_pts = frame->pts;
+    //frame->pkt_dts = nbEncodedFrames;
 
     if(!encode(codecContext, frame, pkt, file))
     {
@@ -185,7 +204,7 @@ bool H264EncoderImpl::write(const std::shared_ptr<ImageData>& img)
     return true;
 }
 
-void H264EncoderImpl::release()
+void VideoEncoderImpl::release()
 {
 
     /* flush the encoder */
@@ -203,14 +222,14 @@ void H264EncoderImpl::release()
     sws_context = NULL;
 }
 
-RPCAM_EXPORTS H264Encoder *createH264EncoderRawPtr()
+RPCAM_EXPORTS VideoEncoder *createVideoEncoderRawPtr()
 {
-	return new H264EncoderImpl();
+	return new VideoEncoderImpl();
 }
 
-RPCAM_EXPORTS void deleteH264EncoderRawPtr(H264Encoder *h264Encoder)
+RPCAM_EXPORTS void deleteVideoEncoderRawPtr(VideoEncoder *videoEncoder)
 {
-	delete h264Encoder;
+	delete videoEncoder;
 }
 
 }
