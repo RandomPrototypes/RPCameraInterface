@@ -33,7 +33,8 @@ PortableString& PortableString::operator=(const PortableString& other)
 PortableString::PortableString(const char *str, size_t size)
 {
     data = (void*)new std::string();
-    ((std::string*)data)->assign(str, size);
+    if(size > 0)
+        ((std::string*)data)->assign(str, size);
 }
 
 PortableString::PortableString(const char *str)
