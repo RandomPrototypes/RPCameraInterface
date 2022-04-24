@@ -77,7 +77,7 @@ static bool write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c,
 }
 
 /* Add an output stream. */
-static bool add_stream(OutputStream *ost, AVFormatContext *oc, const AVCodec **codec, enum AVCodecID codec_id, int height, int width, int fps, int bitrate)
+static bool add_stream(OutputStream *ost, AVFormatContext *oc, const AVCodec **codec, enum AVCodecID codec_id, int height, int width, int fps, int bitrate, bool timebase_in_ms)
 {
     AVCodecContext *c;
     int i;
@@ -137,7 +137,9 @@ static bool add_stream(OutputStream *ost, AVFormatContext *oc, const AVCodec **c
          * timebase should be 1/framerate and timestamp increments should be
          * identical to 1. */
         ost->st->time_base.num = 1;
-        ost->st->time_base.den  = fps;
+        if(timebase_in_ms)
+            ost->st->time_base.den  = 1000;//fps;
+        else ost->st->time_base.den  = fps;
         c->time_base       = ost->st->time_base;
         c->framerate.num = fps;
         c->framerate.den = 1;
@@ -313,7 +315,7 @@ bool VideoEncoderImpl::open(const char *filename, int height, int width, int fps
 
     if (fmt->video_codec != AV_CODEC_ID_NONE) {
         printf("add_stream\n");
-        add_stream(&video_st, oc, &video_codec, fmt->video_codec, height, width, fps, bitrate);
+        add_stream(&video_st, oc, &video_codec, fmt->video_codec, height, width, fps, bitrate, useFrameTimestamp);
     }
     /*if (fmt->audio_codec != AV_CODEC_ID_NONE) {
         add_stream(&audio_st, oc, &audio_codec, fmt->audio_codec);
@@ -374,7 +376,7 @@ bool VideoEncoderImpl::write(const std::shared_ptr<ImageData>& img)
     if(useFrameTimestamp) {
         if(nbEncodedFrames == 0)
             firstFrameTimestamp = img->getTimestamp();
-        video_st.frame->pts = static_cast<int64_t>(static_cast<double>(img->getTimestamp() - firstFrameTimestamp) * fps / 1000 + 0.5);
+        video_st.frame->pts = static_cast<int64_t>(static_cast<double>(img->getTimestamp() - firstFrameTimestamp) + 0.5); //* fps / 1000
     } else {
         video_st.frame->pts = nbEncodedFrames;
     }
