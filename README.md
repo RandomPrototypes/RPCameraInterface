@@ -77,9 +77,15 @@ Preview works as for normal camera, but it is also possible to record in device 
     //wait some time
     cam->stopRecordingAndSaveToFile(videoFilename, timestampFilename);
 ```
+### Install dependencies
+On windows :  
+Use ffmpeg version 4.4.1 ( https://github.com/GyanD/codexffmpeg/releases/download/4.4.1/ffmpeg-4.4.1-full_build-shared.zip ).
+You can try the version 5 if you want but it crashes on my computer.
+
 ### License
 Apache 2
 
 ### Credits
 The DShow backend is based on code from OpenCV and a few functions from libwebcam.  
-The V4L2 backend is based on V4L2 samples and the enumerator is based on code from libwebcam.  
+The V4L2 backend is based on V4L2 samples and the enumerator is based on code from libwebcam.
+Format conversion and video encoding is based on FFMPEG.
