@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16)
 project (RPCameraInterface VERSION 0.1)
 set(CMAKE_CXX_STANDARD 11)
 
+set(CMAKE_DEBUG_POSTFIX "d")
+
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(FetchContent)
