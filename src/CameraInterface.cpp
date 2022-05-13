@@ -30,6 +30,13 @@ CameraInterface::~CameraInterface()
 {
 }
 
+CameraEnumeratorField::CameraEnumeratorField()
+{
+}
+CameraEnumeratorField::~CameraEnumeratorField()
+{
+}
+
 CameraEnumerator::CameraEnumerator()
 {
 }

@@ -154,10 +154,55 @@ VideoContainerType CameraInterfaceBase::getAvailableVideoContainer(size_t id)
 	return VideoContainerType::UNKNOWN;
 }
 
-CameraEnumeratorField::CameraEnumeratorField(const std::string& name, const std::string& type, const std::string& text, const std::string& value)
-    :name(name), type(type), text(text), value(value)
+CameraEnumeratorFieldBase::CameraEnumeratorFieldBase(const std::string& name, const std::string& type, const std::string& text, const std::string& value)
+    :name(name), type(type), text(text), value(value), extraParam(NULL)
 {
+}
 
+CameraEnumeratorFieldBase::~CameraEnumeratorFieldBase()
+{
+}
+
+const char *CameraEnumeratorFieldBase::getName()
+{
+    return name.c_str();
+}
+const char *CameraEnumeratorFieldBase::getType()
+{
+    return type.c_str();
+}
+const char *CameraEnumeratorFieldBase::getText()
+{
+    return text.c_str();
+}
+const char *CameraEnumeratorFieldBase::getValue()
+{
+    return value.c_str();
+}
+void *CameraEnumeratorFieldBase::getExtraParam()
+{
+    return extraParam;
+}
+
+void CameraEnumeratorFieldBase::setName(const char *name)
+{
+    this->name = name;
+}
+void CameraEnumeratorFieldBase::setType(const char *type)
+{
+    this->type = type;
+}
+void CameraEnumeratorFieldBase::setText(const char *text)
+{
+    this->text = text;
+}
+void CameraEnumeratorFieldBase::setValue(const char *value)
+{
+    this->value = value;
+}
+void CameraEnumeratorFieldBase::setExtraParam(void *param)
+{
+    this->extraParam = param;
 }
 
 CameraEnumeratorBase::CameraEnumeratorBase(CaptureBackend backend)
@@ -167,6 +212,8 @@ CameraEnumeratorBase::CameraEnumeratorBase(CaptureBackend backend)
 
 CameraEnumeratorBase::~CameraEnumeratorBase()
 {
+    for(size_t i = 0; i < listParamField.size(); i++)
+        delete listParamField[i];
 }
 
 const char *CameraEnumeratorBase::getCameraId(int id)
@@ -221,6 +268,20 @@ const char *CameraEnumeratorBase::getCameraDescription(const char *id)
 CaptureBackend CameraEnumeratorBase::getBackend()
 {
 	return backend;
+}
+
+const char *CameraEnumeratorBase::getCameraType()
+{
+	return cameraType.c_str();
+}
+
+int CameraEnumeratorBase::getNbParamField()
+{
+    return listParamField.size();
+}
+CameraEnumeratorField *CameraEnumeratorBase::getParamField(int id)
+{
+    return listParamField[id];
 }
 
 }
