@@ -20,8 +20,8 @@ CameraEnumeratorRPNetwork::CameraEnumeratorRPNetwork()
     :CameraEnumeratorBase(CaptureBackend::RPNetworkCamera)
 {
     cameraType = "Network camera";
-    listRequiredField.push_back(CameraEnumeratorField("ip_address", "text", "ip address", ""));
-    listRequiredField.push_back(CameraEnumeratorField("port", "text", "port", "25600"));
+    listParamField.push_back(new CameraEnumeratorFieldBase("ip_address", "text", "ip address", ""));
+    listParamField.push_back(new CameraEnumeratorFieldBase("port", "text", "port", "25600"));
 }
 
 CameraEnumeratorRPNetwork::~CameraEnumeratorRPNetwork()
@@ -49,8 +49,8 @@ bool CameraEnumeratorRPNetwork::detectCameras()
     //qDebug() << "detectCameras";
     listCameras.clear();
     std::shared_ptr<BufferedSocket> bufferedSock = createBufferedSocket();
-    const char *ip_address = listRequiredField[0].value.c_str();
-    int port = std::stoi(listRequiredField[1].value);
+    const char *ip_address = listParamField[0]->getValue();
+    int port = std::stoi(listParamField[1]->getValue());
     if (!bufferedSock->connect(ip_address, port))
     {
         return false;

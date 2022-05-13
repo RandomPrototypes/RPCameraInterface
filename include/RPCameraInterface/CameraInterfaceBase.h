@@ -13,16 +13,26 @@ public:
     std::string description;
 };
 
-class CameraEnumeratorField
+class CameraEnumeratorFieldBase : public CameraEnumeratorField
 {
 public:
-    std::string name;
-    std::string type;
-    std::string text;
-    std::string value;
-    void *extra_param;
-
-    CameraEnumeratorField(const std::string& name, const std::string& type, const std::string& text, const std::string& value = "");
+	CameraEnumeratorFieldBase(const std::string& name, const std::string& type, const std::string& text, const std::string& value = "");
+	virtual ~CameraEnumeratorFieldBase();
+	
+	virtual const char *getName();
+	virtual const char *getType();
+	virtual const char *getText();
+	virtual const char *getValue();
+	virtual void *getExtraParam();
+	
+	virtual void setName(const char *name);
+	virtual void setType(const char *type);
+	virtual void setText(const char *text);
+	virtual void setValue(const char *value);
+	virtual void setExtraParam(void *param);
+	
+	std::string name, type, text, value;
+	void *extraParam;
 };
 
 class CameraEnumeratorBase : public CameraEnumerator
@@ -40,11 +50,16 @@ public:
     virtual const char *getCameraDescription(const char *id);
     virtual int count();
     virtual CaptureBackend getBackend();
+    virtual const char *getCameraType();
+    
+        
+    virtual int getNbParamField();
+    virtual CameraEnumeratorField *getParamField(int id); 
     
     CaptureBackend backend;
     std::string cameraType;
     std::vector<CameraInfo> listCameras;
-    std::vector<CameraEnumeratorField> listRequiredField;//first : field name, second : field type ("text", "number")
+    std::vector<CameraEnumeratorFieldBase*> listParamField;
 };
 
 class CameraInterfaceBase : public CameraInterface

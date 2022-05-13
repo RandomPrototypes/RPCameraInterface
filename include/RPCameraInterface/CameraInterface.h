@@ -23,6 +23,25 @@ enum class CaptureBackend
     OpenCV,
 };
 
+class RPCAM_EXPORTS CameraEnumeratorField
+{
+public:
+	CameraEnumeratorField();
+	virtual ~CameraEnumeratorField();
+	
+	virtual const char *getName() = 0;
+	virtual const char *getType() = 0;
+	virtual const char *getText() = 0;
+	virtual const char *getValue() = 0;
+	virtual void *getExtraParam() = 0;
+	
+	virtual void setName(const char *name) = 0;
+	virtual void setType(const char *type) = 0;
+	virtual void setText(const char *text) = 0;
+	virtual void setValue(const char *value) = 0;
+	virtual void setExtraParam(void *param) = 0;
+};
+
 class RPCAM_EXPORTS CameraEnumerator
 {
 public:
@@ -38,6 +57,10 @@ public:
     virtual const char *getCameraDescription(const char *id) = 0;
     virtual int count() = 0;
     virtual CaptureBackend getBackend() = 0;
+    virtual const char *getCameraType() = 0;
+    
+    virtual int getNbParamField() = 0;
+    virtual CameraEnumeratorField *getParamField(int id) = 0; 
 };
 
 class RPCAM_EXPORTS CameraInterface
