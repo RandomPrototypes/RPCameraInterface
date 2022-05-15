@@ -9,6 +9,7 @@ extern "C" {
 #include <libavutil/mathematics.h>
 #include <libavutil/samplefmt.h>
 #include <libswscale/swscale.h>
+#include <libswresample/swresample.h>
 #include <libavformat/avformat.h>
 }
 
@@ -25,6 +26,7 @@ public:
 	virtual ~VideoEncoder();
     virtual bool open(const char *filename, int height, int width, int fps = 30, const char *encoderName = "", int bitrate = 2000000, const char *preset = "fast") = 0;
     virtual bool write(const std::shared_ptr<ImageData>& img) = 0;
+    virtual bool write_audio(float *buffer, int length, uint64_t timestamp) = 0;
     virtual void release() = 0;
     virtual void setUseFrameTimestamp(bool useFrameTimestamp) = 0;
 };
