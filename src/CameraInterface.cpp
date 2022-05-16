@@ -13,6 +13,8 @@
 #include "RPCameraInterface/CameraInterfaceV4L2.h"
 #endif
 
+#include "RPCameraInterface/CameraInterfaceOpenCV.h"
+
 namespace RPCameraInterface
 {
 
@@ -87,6 +89,8 @@ RPCAM_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends()
     #endif
 
 	list.push_back(CaptureBackend::RPNetworkCamera);
+
+    list.push_back(CaptureBackend::OpenCV);
     return list;
 }
 RPCAM_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend backend)
@@ -110,6 +114,9 @@ RPCAM_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBacke
     	
     	case CaptureBackend::RPNetworkCamera:
             return std::make_shared<CameraEnumeratorRPNetwork>();
+        
+        case CaptureBackend::OpenCV:
+            return std::make_shared<CameraEnumeratorOpenCV>();
     }
 
     return std::shared_ptr<CameraEnumerator>();
@@ -135,6 +142,9 @@ RPCAM_EXPORTS std::shared_ptr<CameraInterface> getCameraInterface(CaptureBackend
         
     	case CaptureBackend::RPNetworkCamera:
             return std::make_shared<CameraInterfaceRPNetwork>();
+        
+        case CaptureBackend::OpenCV:
+            return std::make_shared<CameraInterfaceOpenCV>();
     }
 
     return std::shared_ptr<CameraInterface>();

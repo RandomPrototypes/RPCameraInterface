@@ -219,8 +219,6 @@ static bool open_audio(AVFormatContext *oc, const AVCodec *codec, OutputStream *
         fprintf(stderr, "Could not open audio codec\n");
         return false;
     }
-    FILE *debugTimestamp = fopen("debugTimestamp.csv", "w");
-    fclose(debugTimestamp);
     ost->samples_count = 0;
     ost->next_pts = 0;
     /* init signal generator */
@@ -418,7 +416,6 @@ bool VideoEncoderImpl::open(const char *filename, int height, int width, int fps
     fmt = oc->oformat;
 
     if (fmt->video_codec != AV_CODEC_ID_NONE) {
-        printf("add_stream\n");
         add_stream(&video_st, oc, &video_codec, fmt->video_codec, height, width, fps, bitrate, useFrameTimestamp);
     }
     if (fmt->audio_codec != AV_CODEC_ID_NONE) {
@@ -434,7 +431,6 @@ bool VideoEncoderImpl::open(const char *filename, int height, int width, int fps
 
 
     if (!(fmt->flags & AVFMT_NOFILE)) {
-        printf("avio_open\n");
         ret = avio_open(&oc->pb, filename, AVIO_FLAG_WRITE);
         if (ret < 0) {
             printf("Could not open '%s'\n", filename);
@@ -495,7 +491,6 @@ bool VideoEncoderImpl::write_audio(float *buffer, int length, uint64_t timestamp
 {
     if(firstFrameTimestampAudio == 0)
         firstFrameTimestampAudio = timestamp;
-    printf("write_audio, buf length %d\n", length);
     if(length == 0)
         return false;
     AVCodecContext *c;
@@ -529,13 +524,12 @@ bool VideoEncoderImpl::write_audio(float *buffer, int length, uint64_t timestamp
         firstLoop = false;
     }
 
-    printf("pts_diff %s, speed %f\n", std::to_string(pts_diff).c_str(), speed);
+    //printf("pts_diff %s, speed %f\n", std::to_string(pts_diff).c_str(), speed);
     rescaleAndAppendToAudioBuffer(buffer, length, 2, speed);
 
     while(audioBuffer.size() >= audio_st.tmp_frame->nb_samples*2) {
         int current_length = audio_st.tmp_frame->nb_samples*2;//std::min(audio_st.tmp_frame->nb_samples*2, length);
     
-        printf("get_audio_frame %d\n", current_length);
         frame = get_audio_frame(&audio_st, &audioBuffer[0], current_length);
         audioBuffer.erase(audioBuffer.begin(), audioBuffer.begin() + current_length);
 
@@ -576,10 +570,6 @@ bool VideoEncoderImpl::write_audio(float *buffer, int length, uint64_t timestamp
             //frame->pts = audio_st.samples_count;//av_rescale_q(audio_st->samples_count, (AVRational){1, c->sample_rate}, c->time_base);
             //frame->pts = (timestamp - firstFrameTimestampAudio) * c->sample_rate / 1000000;
 
-            FILE *debugTimestamp = fopen("debugTimestamp.csv", "a");
-            fprintf(debugTimestamp, "%lu,%lu\n", audio_st.samples_count, (timestamp - firstFrameTimestampAudio) * c->sample_rate / 1000000);
-            fclose(debugTimestamp);
-            printf("audio pts %d\n", (int)frame->pts);
             audio_st.samples_count += dst_nb_samples;
         }
     
