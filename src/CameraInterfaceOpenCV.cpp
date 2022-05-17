@@ -52,13 +52,9 @@ CameraInterfaceOpenCV::~CameraInterfaceOpenCV()
 }
 
 
-std::string& ltrim(std::string &s)
+inline std::string& ltrim(std::string& s, const char* t = " \t\n\r\f\v")
 {
-    auto it = std::find_if(s.begin(), s.end(),
-                    [](char c) {
-                        return !std::isspace<char>(c, std::locale::classic());
-                    });
-    s.erase(s.begin(), it);
+    s.erase(0, s.find_first_not_of(t));
     return s;
 }
 
