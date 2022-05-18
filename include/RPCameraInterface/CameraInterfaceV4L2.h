@@ -76,6 +76,8 @@ private:
     unsigned char *lastFrameData;
     int lastFrameDataLength;
     int lastFrameDataAllocatedSize;
+    
+    bool hasStartedCapturing;
 
     unsigned int n_buffers;
 };
