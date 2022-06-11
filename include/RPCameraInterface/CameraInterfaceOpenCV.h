@@ -6,6 +6,15 @@
 namespace RPCameraInterface
 {
 
+class CameraEnumeratorOpenCV : public CameraEnumeratorBase
+{
+public:
+    CameraEnumeratorOpenCV();
+    virtual ~CameraEnumeratorOpenCV();
+
+    virtual bool detectCameras();
+};
+
 class CameraInterfaceOpenCV : public CameraInterfaceBase
 {
 public:

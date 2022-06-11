@@ -13,7 +13,7 @@ check_include_file(dshow.h HAVE_DSHOW)
 check_include_file(linux/videodev2.h HAVE_V4L2)
 
 option(USE_QT "Use QT" OFF)
-option(USE_OPENCV "Use OpenCV" OFF)
+option(USE_OPENCV "Use OpenCV" ON)
 option(BUILD_DEMO "Build DEMO" OFF)
 
 set(EXTERNAL_INSTALL_LOCATION deps)

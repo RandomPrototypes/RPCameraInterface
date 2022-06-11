@@ -1,0 +1,14 @@
+Source: rpcamerainterface
+Section: devel
+Priority: optional
+Maintainer: delmotte arnaud <delfare1-randomprototypes@yahoo.com>
+Build-Depends: cmake, build-essential, libopencv-dev, libavdevice-dev, libavfilter-dev, libavformat-dev, libavcodec-dev, libswresample-dev, libswscale-dev, libavutil-dev
+Standards-Version: 4.4.1
+Homepage: https://github.com/RandomPrototypes/RPCameraInterface
+
+Package: rpcamerainterface
+Architecture: any
+Depends: libopencv-dev, libavdevice-dev, libavfilter-dev, libavformat-dev, libavcodec-dev, libswresample-dev, libswscale-dev, libavutil-dev
+Description: Multi-platform camera library
+ Multi-platform camera library with functions to enumerate the available cameras,
+ available formats, and record the result.

@@ -4,6 +4,39 @@
 namespace RPCameraInterface
 {
 
+CameraEnumeratorOpenCV::CameraEnumeratorOpenCV()
+    :CameraEnumeratorBase(CaptureBackend::OpenCV)
+{
+    cameraType = "OpenCV camera";
+    listParamField.push_back(new CameraEnumeratorFieldBase("cam_id", "text", "camera id", "0"));
+    listParamField.push_back(new CameraEnumeratorFieldBase("capture_backend", "text", "backend", "any"));
+}
+
+CameraEnumeratorOpenCV::~CameraEnumeratorOpenCV()
+{
+}
+
+bool CameraEnumeratorOpenCV::detectCameras()
+{
+    //qDebug() << "detectCameras";
+    listCameras.clear();
+    CameraInfo camInfo;
+    const char *cam_id = listParamField[0]->getValue();
+    const char *capture_backend = listParamField[1]->getValue();
+    camInfo.id = "backend="+std::string(capture_backend)+"; "+std::string(cam_id);
+    std::string name;
+    if(!strcmp(capture_backend, "any"))
+        camInfo.name = std::string(cam_id);
+    else camInfo.name = std::string(capture_backend)+": "+std::string(cam_id);
+    camInfo.description = "backend: "+std::string(capture_backend)+", camera id: "+std::string(cam_id);
+    CameraInterfaceOpenCV cam;
+    if(!cam.open(camInfo.id.c_str()))
+        return false;
+    cam.close();
+    listCameras.push_back(camInfo);
+    return true;
+}
+
 CameraInterfaceOpenCV::CameraInterfaceOpenCV()
     :CameraInterfaceBase(CaptureBackend::OpenCV)
 {
@@ -18,9 +51,87 @@ CameraInterfaceOpenCV::~CameraInterfaceOpenCV()
     }
 }
 
+
+inline std::string& ltrim(std::string& s, const char* t = " \t\n\r\f\v")
+{
+    s.erase(0, s.find_first_not_of(t));
+    return s;
+}
+
 bool CameraInterfaceOpenCV::open(const char *params)
 {
-    cap = new cv::VideoCapture(std::stoi(params), cv::CAP_DSHOW);
+    std::map<std::string, int> listBackends;
+    listBackends.insert(std::make_pair("any", cv::CAP_ANY));
+    listBackends.insert(std::make_pair("vfw", cv::CAP_VFW));
+    listBackends.insert(std::make_pair("v4l", cv::CAP_V4L));
+    listBackends.insert(std::make_pair("v4l2", cv::CAP_V4L2));
+    listBackends.insert(std::make_pair("firewire", cv::CAP_FIREWIRE));
+    listBackends.insert(std::make_pair("qt", cv::CAP_QT));
+    listBackends.insert(std::make_pair("unicap", cv::CAP_UNICAP));
+    listBackends.insert(std::make_pair("dshow", cv::CAP_DSHOW));
+    listBackends.insert(std::make_pair("pvapi", cv::CAP_PVAPI));
+    listBackends.insert(std::make_pair("openni", cv::CAP_OPENNI));
+    listBackends.insert(std::make_pair("openni_asus", cv::CAP_OPENNI_ASUS));
+    listBackends.insert(std::make_pair("android", cv::CAP_ANDROID));
+    listBackends.insert(std::make_pair("xiapi", cv::CAP_XIAPI));
+    listBackends.insert(std::make_pair("avfoundation", cv::CAP_AVFOUNDATION));
+    listBackends.insert(std::make_pair("giganetix", cv::CAP_GIGANETIX));
+    listBackends.insert(std::make_pair("msmf", cv::CAP_MSMF));
+    listBackends.insert(std::make_pair("winrt", cv::CAP_WINRT));
+    listBackends.insert(std::make_pair("intelperc", cv::CAP_INTELPERC));
+    listBackends.insert(std::make_pair("openni2", cv::CAP_OPENNI2));
+    listBackends.insert(std::make_pair("openni2_asus", cv::CAP_OPENNI2_ASUS));
+    listBackends.insert(std::make_pair("gphoto2", cv::CAP_GPHOTO2));
+    listBackends.insert(std::make_pair("gstreamer", cv::CAP_GSTREAMER));
+    listBackends.insert(std::make_pair("ffmpeg", cv::CAP_FFMPEG));
+    listBackends.insert(std::make_pair("images", cv::CAP_IMAGES));
+    listBackends.insert(std::make_pair("aravis", cv::CAP_ARAVIS));
+    listBackends.insert(std::make_pair("opencv_mjpeg", cv::CAP_OPENCV_MJPEG));
+    listBackends.insert(std::make_pair("intel_mfx", cv::CAP_INTEL_MFX));
+    listBackends.insert(std::make_pair("xine", cv::CAP_XINE));
+    try
+    {
+        int id = std::stoi(params);
+        cap = new cv::VideoCapture(id, cv::CAP_ANY);
+    } catch(const std::invalid_argument& ia) {
+        std::string str = params;
+        ltrim(str);
+        int capture_backend = cv::CAP_ANY;
+        if(str.rfind("backend", 0) == 0) {
+            str.erase(str.begin(), str.begin()+strlen("backend"));
+            ltrim(str);
+            if(str[0] != '=')
+                return false;
+            str.erase(str.begin(), str.begin()+1);
+            ltrim(str);
+            int longest_match = 0;
+            for(auto& backend : listBackends) {
+                if(str.rfind(backend.first, 0) == 0 && backend.first.size() > longest_match) {
+                    capture_backend = backend.second;
+                    longest_match = backend.first.size();
+                }
+            }
+            if(longest_match == 0)
+                return false;
+            str.erase(str.begin(), str.begin()+longest_match);
+            ltrim(str);
+            if(str[0] == ';')
+                str.erase(str.begin(), str.begin()+1);
+            ltrim(str);
+        }
+        try
+        {
+            int id = std::stoi(str.c_str());
+            cap = new cv::VideoCapture(id, capture_backend);
+        } catch(std::invalid_argument& ia2) {
+            cap = new cv::VideoCapture(str.c_str(), capture_backend);
+        } catch(const std::exception& e) {
+            return false;
+        }
+    } catch(const std::exception& e) {
+        return false;
+    }
+    
     if(!cap->isOpened()) {
         delete cap;
         cap = NULL;
@@ -62,8 +173,9 @@ bool CameraInterfaceOpenCV::close()
 
 void CameraInterfaceOpenCV::testAvailableFormats()
 {
-    std::vector<cv::Size> listSizeToTest = {cv::Size(320,240), cv::Size(640,480), cv::Size(1280,720), cv::Size(1920,1080),
-                                            cv::Size(3840,2160), cv::Size(4096,2160)};
+    std::vector<cv::Size> listSizeToTest = {cv::Size(320,240), cv::Size(640,480), cv::Size(1280,720), cv::Size(1920,1080)
+                                            //, cv::Size(3840,2160), cv::Size(4096,2160)
+                                            };
     std::vector<ImageFormat> list;
     for(const cv::Size& size : listSizeToTest) {
         ImageFormat format;
@@ -72,9 +184,9 @@ void CameraInterfaceOpenCV::testAvailableFormats()
         format.type = ImageType::BGR24;
         if(testResolution(size.width, size.height, false))
             list.push_back(format);
-        format.type = ImageType::JPG;
+        /*format.type = ImageType::JPG;
         if(testResolution(size.width, size.height, true))
-            list.push_back(format);
+            list.push_back(format);*/
     }
     listFormats = list;
 }
@@ -131,10 +243,10 @@ const char *CameraInterfaceOpenCV::getErrorMsg()
 bool CameraInterfaceOpenCV::startCapturing()
 {
     if(cap != NULL) {
-        if(imageFormat.type == ImageType::JPG) {
+        /*if(imageFormat.type == ImageType::JPG) {
             cap->set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('m', 'j', 'p', 'g'));
             cap->set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
-        } else {
+        } else*/ {
             cap->set(cv::CAP_PROP_FOURCC, default_fourcc);
         }
         //cap->set(cv::CAP_PROP_FOURCC, imageFormat.type == ImageType::MJPG ? mjpg_fourcc : default_fourcc);

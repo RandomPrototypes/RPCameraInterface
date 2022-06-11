@@ -131,6 +131,7 @@ CameraInterfaceV4L2::CameraInterfaceV4L2()
     lastFrameData = NULL;
     lastFrameDataLength = 0;
     lastFrameDataAllocatedSize = 0;
+    hasStartedCapturing = false;
 }
 
 CameraInterfaceV4L2::~CameraInterfaceV4L2()
@@ -502,6 +503,7 @@ bool CameraInterfaceV4L2::startCapturing()
             errno_exit("VIDIOC_STREAMON");
         break;
     }
+    hasStartedCapturing = true;
     return true;
 }
 
@@ -521,11 +523,15 @@ bool CameraInterfaceV4L2::stopCapturing()
             errno_exit("VIDIOC_STREAMOFF");
         break;
     }
-    return uninitDevice();
+    bool ret = uninitDevice();
+    hasStartedCapturing = false;
+    return ret;
 }
 
 bool CameraInterfaceV4L2::close()
 {
+    if(hasStartedCapturing)
+        stopCapturing();
     if (-1 == ::close(fd)) {
         errorMsg.clear();
         errorMsg << "close";
