@@ -76,7 +76,7 @@ if(${USE_QT})
 endif()
 
 if(${USE_OPENCV} OR ${BUILD_DEMO})
-    find_package(OpenCV REQUIRED)
+    find_package(OpenCV REQUIRED videoio)
 endif()
 if(${USE_OPENCV})
     set(LIB_SRC ${LIB_SRC} src/CameraInterfaceOpenCV.cpp)
