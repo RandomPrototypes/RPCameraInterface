@@ -468,19 +468,25 @@ static AVFrame *get_audio_frame(OutputStream *ost, float *buffer, int length)
  
     frame->pts = ost->next_pts;
     ost->next_pts  += frame->nb_samples;
+    //printf("pts %d, nb_samples %d\n", (int)frame->pts, (int)frame->nb_samples);
  
     return frame;
 }
 
 void VideoEncoderImpl::rescaleAndAppendToAudioBuffer(float *buffer, int length, int nbChannel, float speed)
 {
-    int nbSampleSrc = length / nbChannel;
-    int nbSampleDst = (int)(nbSampleSrc / speed + 0.5);
-    for(int i = 0; i < nbSampleDst; i++)
-    {
-        int i2 = (i * nbSampleSrc + (nbSampleDst/2)) / nbSampleDst;
-        for(int j = 0; j < 2; j++) {
-            audioBuffer.push_back(buffer[i2*2+j]);
+    if(fabs(speed-1) < 0.0001) {
+        for(int i = 0; i < length; i++) 
+            audioBuffer.push_back(buffer[i]);
+    } else {
+        int nbSampleSrc = length / nbChannel;
+        int nbSampleDst = (int)(nbSampleSrc / speed + 0.5);
+        for(int i = 0; i < nbSampleDst; i++)
+        {
+            int i2 = (i * nbSampleSrc + (nbSampleDst/2)) / nbSampleDst;
+            for(int j = 0; j < 2; j++) {
+                audioBuffer.push_back(buffer[i2*2+j]);
+            }
         }
     }
     lastAudioVal[0] = audioBuffer[audioBuffer.size()-2];
@@ -505,6 +511,7 @@ bool VideoEncoderImpl::write_audio(float *buffer, int length, uint64_t timestamp
     int64_t pts_diff;
     float speed;
     bool firstLoop = true;
+    int nbEmptySample = 0;
     while(true)
     {
         pts = audio_st.next_pts + audioBuffer.size() / 2;
@@ -514,17 +521,24 @@ bool VideoEncoderImpl::write_audio(float *buffer, int length, uint64_t timestamp
         int64_t nbRecoverySec = 5;
 
         //(speed-1)*nbRecoverySec*c->sample_rate = -pts_diff
+        if(nbEmptySample == 0 && fabs(static_cast<float>(pts_diff)) / c->sample_rate < 0.1) 
+        {
+            speed = 1;
+            break;
+        }
         speed = 1.0 - static_cast<float>(pts_diff) / (nbRecoverySec*c->sample_rate);
-        if((firstLoop && speed >= 0.95) || speed >= 1.0)
+        if((firstLoop && speed >= 0.99) || speed >= 1.0)
             break;
         else {
             audioBuffer.push_back(lastAudioVal[0]);
             audioBuffer.push_back(lastAudioVal[1]);
+            nbEmptySample++;
         }
         firstLoop = false;
     }
 
-    //printf("pts_diff %s, speed %f\n", std::to_string(pts_diff).c_str(), speed);
+    //if(fabs(speed - 1) > 0.0001 || nbEmptySample != 0 || fabs(static_cast<float>(pts_diff)) / c->sample_rate > 0.0015)
+      //  printf("pts_diff %s, speed %f, nbEmptySample %d\n", std::to_string(pts_diff).c_str(), speed, nbEmptySample);
     rescaleAndAppendToAudioBuffer(buffer, length, 2, speed);
 
     while(audioBuffer.size() >= audio_st.tmp_frame->nb_samples*2) {
@@ -540,7 +554,6 @@ bool VideoEncoderImpl::write_audio(float *buffer, int length, uint64_t timestamp
             /* compute destination number of samples */
             dst_nb_samples = av_rescale_rnd(swr_get_delay(audio_st.swr_ctx, c->sample_rate) + frame->nb_samples,
                                             c->sample_rate, c->sample_rate, AV_ROUND_UP);
-            printf("%d == %d\n", dst_nb_samples, frame->nb_samples);
             av_assert0(dst_nb_samples == frame->nb_samples);
     
             /* when we pass a frame to the encoder, it may keep a reference to it
