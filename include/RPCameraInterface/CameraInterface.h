@@ -21,6 +21,7 @@ enum class CaptureBackend
     V4L2,
     LibWebcam,
     OpenCV,
+    DepthAI
 };
 
 class RPCAM_EXPORTS CameraEnumeratorField

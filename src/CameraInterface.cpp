@@ -15,6 +15,10 @@
 
 #include "RPCameraInterface/CameraInterfaceOpenCV.h"
 
+#ifdef USE_DEPTHAI
+#include "RPCameraInterface/CameraInterfaceDepthAI.h"
+#endif
+
 namespace RPCameraInterface
 {
 
@@ -91,6 +95,11 @@ RPCAM_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends()
 	list.push_back(CaptureBackend::RPNetworkCamera);
 
     list.push_back(CaptureBackend::OpenCV);
+
+    #ifdef USE_DEPTHAI
+    list.push_back(CaptureBackend::DepthAI);
+    #endif
+
     return list;
 }
 RPCAM_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend backend)
@@ -117,6 +126,14 @@ RPCAM_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBacke
         
         case CaptureBackend::OpenCV:
             return std::make_shared<CameraEnumeratorOpenCV>();
+
+        #ifdef USE_DEPTHAI
+        case CaptureBackend::DepthAI:
+            return std::make_shared<CameraEnumeratorDepthAI>();
+        #endif
+
+        default:
+            return std::shared_ptr<CameraEnumerator>();
     }
 
     return std::shared_ptr<CameraEnumerator>();
@@ -145,6 +162,13 @@ RPCAM_EXPORTS std::shared_ptr<CameraInterface> getCameraInterface(CaptureBackend
         
         case CaptureBackend::OpenCV:
             return std::make_shared<CameraInterfaceOpenCV>();
+        
+        #ifdef USE_DEPTHAI
+        case CaptureBackend::DepthAI:
+            return std::make_shared<CameraInterfaceDepthAI>();
+        #endif
+        default:
+            return std::shared_ptr<CameraInterface>();
     }
 
     return std::shared_ptr<CameraInterface>();

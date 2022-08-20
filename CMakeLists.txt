@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 project (RPCameraInterface VERSION 0.1)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_DEBUG_POSTFIX "d")
 
@@ -14,6 +14,7 @@ check_include_file(linux/videodev2.h HAVE_V4L2)
 
 option(USE_QT "Use QT" OFF)
 option(USE_OPENCV "Use OpenCV" ON)
+option(USE_DEPTHAI "Use DepthAI" OFF)
 option(BUILD_DEMO "Build DEMO" OFF)
 
 set(EXTERNAL_INSTALL_LOCATION deps)
@@ -45,6 +46,14 @@ if(WIN32)
 else()
    find_package(PkgConfig REQUIRED)
    pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET libavdevice libavfilter libavformat libavcodec libswresample libswscale libavutil)
+endif()
+
+if(USE_DEPTHAI)
+	find_package(depthai CONFIG REQUIRED)
+	set(depthai_INCLUDE_DIR ${depthai_DIR}/../../../include)
+	include_directories(${depthai_INCLUDE_DIR})
+	include_directories(${depthai_INCLUDE_DIR}/depthai-shared/3rdparty)
+	include_directories(${libnop_DIR}/../../../include)
 endif()
 
 set(LIB_SRC
@@ -111,6 +120,14 @@ else()
 	message(STATUS "    V4L2      : NO")
 endif()
 
+if(USE_DEPTHAI)
+	message(STATUS "    DepthAI   : YES")
+	set(LIB_SRC ${LIB_SRC} src/CameraInterfaceDepthAI.cpp)
+   set(LIB_INCLUDE ${LIB_INCLUDE} include/RPCameraInterface/CameraInterfaceDepthAI.h)
+else()
+	message(STATUS "    DepthAI   : NO")
+endif()
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_library(RPCameraInterface SHARED ${LIB_SRC} ${LIB_INCLUDE})
@@ -131,6 +148,9 @@ endif()
 if(HAVE_V4L2)
 	target_compile_definitions(RPCameraInterface PUBLIC "HAVE_V4L2")
 endif()
+if(USE_DEPTHAI)
+	target_compile_definitions(RPCameraInterface PUBLIC "USE_DEPTHAI")
+endif()
 
 if(WIN32)
    if(MSVC)
@@ -144,6 +164,10 @@ else()
 endif()
 if(${USE_OPENCV})
    target_link_libraries(RPCameraInterface PRIVATE ${OpenCV_LIBS_minimal})
+endif()
+
+if(USE_DEPTHAI)
+	target_link_libraries(RPCameraInterface PRIVATE depthai::opencv)
 endif()
 
 if(BUILD_DEMO)
