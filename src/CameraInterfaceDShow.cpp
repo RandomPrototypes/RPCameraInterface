@@ -59,46 +59,6 @@ CameraInterfaceDShow::~CameraInterfaceDShow()
 {
 }
 
-ImageType toImageType(const std::string& guid)
-{
-
-    if(guid == "AYUV") {
-        return ImageType::AYUV;
-    } else if(guid == "RGB24") {
-        return ImageType::RGB24;
-    } else if(guid == "RGB32") {
-        return ImageType::BGRA32;
-    } else if(guid == "RGB555") {
-        return ImageType::RGB555;
-    } else if(guid == "RGB565") {
-        return ImageType::RGB565;
-    } else if(guid == "IYUV" || guid == "I420" || guid == "YV12") {
-        return ImageType::YUV420P;
-    } else if(guid == "UYVY") {
-        return ImageType::UYVY;
-    } else if(guid == "Y211") {
-        return ImageType::Y211;
-    } else if(guid == "Y411" || guid == "Y41P") {
-        return ImageType::Y41P;
-    } else if(guid == "YUY2" || guid == "YUYV") {
-        return ImageType::YUYV422;
-    } else if(guid == "YVU9") {
-        return ImageType::YVU9;
-    } else if(guid == "YVYU") {
-        return ImageType::YVYU;
-    } else if(guid == "Y8" || guid == "Y800" || guid == "GREY") {
-        return ImageType::GRAY8;
-    } else if(guid == "BY8") {
-        return ImageType::BY8;
-    } else if(guid == "Y16") {
-        return ImageType::Y16;
-    } else if(guid == "MJPG") {
-        return ImageType::JPG;
-    } else {
-        return ImageType::UNKNOWN;
-    }
-}
-
 bool CameraInterfaceDShow::open(const char *params)
 {
     videoInput& g_VI = DShowVideoInput::getVideoInput();

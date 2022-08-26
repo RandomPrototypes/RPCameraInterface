@@ -4,6 +4,8 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_DEBUG_POSTFIX "d")
 
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(FetchContent)
@@ -14,6 +16,7 @@ check_include_file(linux/videodev2.h HAVE_V4L2)
 
 option(USE_QT "Use QT" OFF)
 option(USE_OPENCV "Use OpenCV" ON)
+option(USE_GSTREAMER "Use GStreamer" ON)
 option(USE_DEPTHAI "Use DepthAI" OFF)
 option(BUILD_DEMO "Build DEMO" OFF)
 
@@ -84,6 +87,18 @@ if(${USE_QT})
     set(LIB_INCLUDE ${LIB_INCLUDE} include/RPCameraInterface/CameraEnumeratorQt.h)
 endif()
 
+if(${USE_GSTREAMER})
+	#pkg_search_module(GLIB REQUIRED glib-2.0) 
+	#pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
+	#pkg_check_modules(GST_APP REQUIRED gstreamer-app-1.0)
+	#pkg_check_modules(GST_VIDEO REQUIRED gstreamer-video-1.0)
+	find_package(GStreamer COMPONENTS base)
+	find_package(GLIB2)
+	include_directories(${GSTREAMER_INCLUDE_DIR} ${GLIB2_INCLUDE_DIR})
+	set(LIB_SRC ${LIB_SRC} src/CameraInterfaceGStreamer.cpp)
+    set(LIB_INCLUDE ${LIB_INCLUDE} include/RPCameraInterface/CameraInterfaceGStreamer.h)
+endif()
+
 if(${USE_OPENCV} OR ${BUILD_DEMO})
     find_package(OpenCV REQUIRED videoio)
     set(OpenCV_LIBS_minimal ${OpenCV_LIBS})
@@ -152,6 +167,10 @@ if(USE_DEPTHAI)
 	target_compile_definitions(RPCameraInterface PUBLIC "USE_DEPTHAI")
 endif()
 
+if(USE_GSTREAMER)
+	target_compile_definitions(RPCameraInterface PUBLIC "USE_GSTREAMER")
+endif()
+
 if(WIN32)
    if(MSVC)
       target_link_libraries(RPCameraInterface PRIVATE avdevice avfilter avformat avcodec swresample swscale avutil)
@@ -162,6 +181,11 @@ if(WIN32)
 else()
    target_link_libraries(RPCameraInterface PRIVATE PkgConfig::LIBAV)
 endif()
+
+if(${USE_GSTREAMER})
+	target_link_libraries(RPCameraInterface PRIVATE ${GST_APP_LIBRARIES} ${GST_VIDEO_LIBRARIES})
+endif()
+
 if(${USE_OPENCV})
    target_link_libraries(RPCameraInterface PRIVATE ${OpenCV_LIBS_minimal})
 endif()

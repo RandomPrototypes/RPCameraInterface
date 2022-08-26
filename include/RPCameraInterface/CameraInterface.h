@@ -21,6 +21,7 @@ enum class CaptureBackend
     V4L2,
     LibWebcam,
     OpenCV,
+    GStreamer,
     DepthAI
 };
 

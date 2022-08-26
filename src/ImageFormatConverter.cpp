@@ -14,6 +14,8 @@ AVPixelFormat ImageTypeToAVPixelFormat(ImageType type)
             return AV_PIX_FMT_GRAY8;
         case ImageType::RGB24:
             return AV_PIX_FMT_RGB24;
+        case ImageType::RGBA32:
+            return AV_PIX_FMT_RGBA;
         case ImageType::BGR24:
             return AV_PIX_FMT_BGR24;
         case ImageType::BGRA32:
@@ -42,6 +44,10 @@ AVPixelFormat ImageTypeToAVPixelFormat(ImageType type)
             return AV_PIX_FMT_NONE;
         case ImageType::Y16:
             return AV_PIX_FMT_NONE;
+        case ImageType::NV12:
+            return AV_PIX_FMT_NV12;
+        case ImageType::NV21:
+            return AV_PIX_FMT_NV21;
         case ImageType::JPG:
             return AV_PIX_FMT_NONE;
         default:

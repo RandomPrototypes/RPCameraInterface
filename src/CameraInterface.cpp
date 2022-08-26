@@ -19,6 +19,10 @@
 #include "RPCameraInterface/CameraInterfaceDepthAI.h"
 #endif
 
+#ifdef USE_GSTREAMER
+#include "RPCameraInterface/CameraInterfaceGStreamer.h"
+#endif
+
 namespace RPCameraInterface
 {
 
@@ -100,10 +104,15 @@ RPCAM_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends()
     list.push_back(CaptureBackend::DepthAI);
     #endif
 
+    #ifdef USE_GSTREAMER
+    list.push_back(CaptureBackend::GStreamer);
+    #endif
+
     return list;
 }
 RPCAM_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend backend)
 {
+    printf("getCameraEnumerator %d\n", (int)backend);
 	if(backend == CaptureBackend::Any) {
 		std::vector<CaptureBackend> list = getAvailableCaptureBackends();
 		if(list.size() > 0)
@@ -130,6 +139,12 @@ RPCAM_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBacke
         #ifdef USE_DEPTHAI
         case CaptureBackend::DepthAI:
             return std::make_shared<CameraEnumeratorDepthAI>();
+        #endif
+
+        #ifdef USE_GSTREAMER
+        case CaptureBackend::GStreamer:
+            printf("capture backend gstreamer\n");
+            return std::make_shared<CameraEnumeratorGStreamer>();
         #endif
 
         default:
@@ -167,6 +182,12 @@ RPCAM_EXPORTS std::shared_ptr<CameraInterface> getCameraInterface(CaptureBackend
         case CaptureBackend::DepthAI:
             return std::make_shared<CameraInterfaceDepthAI>();
         #endif
+
+        #ifdef USE_GSTREAMER
+        case CaptureBackend::GStreamer:
+            return std::make_shared<CameraInterfaceGStreamer>();
+        #endif
+
         default:
             return std::shared_ptr<CameraInterface>();
     }

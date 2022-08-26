@@ -13,6 +13,7 @@ enum class ImageType
     GRAY8,
     RGB24,
     BGR24,
+    RGBA32,
     BGRA32,
     RGB555,
     RGB565,
@@ -26,6 +27,8 @@ enum class ImageType
     YVYU,
     BY8,
     Y16,
+    NV12,
+    NV21,
     JPG,
     NB_FORMAT_TYPE
 };
@@ -42,6 +45,9 @@ enum class VideoContainerType
     NONE,
     MP4
 };
+
+RPCAM_EXPORTS ImageType toImageType(const char *guid);
+
 
 RPCAM_EXPORTS std::string toString(ImageType type);
 

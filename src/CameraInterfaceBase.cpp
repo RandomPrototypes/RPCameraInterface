@@ -28,6 +28,8 @@ std::string toString(ImageType type)
             return "RGB24";
         case ImageType::BGR24:
             return "BGR24";
+        case ImageType::RGBA32:
+            return "RGBA32";
         case ImageType::BGRA32:
             return "BGRA32";
         case ImageType::RGB555:
@@ -50,6 +52,14 @@ std::string toString(ImageType type)
             return "YVU9";
         case ImageType::YVYU:
             return "YVYU";
+        case ImageType::BY8:
+            return "BY8";
+        case ImageType::Y16:
+            return "Y16";
+        case ImageType::NV12:
+            return "NV12";
+        case ImageType::NV21:
+            return "NV21";
         case ImageType::JPG:
             return "JPG";
         default:

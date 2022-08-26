@@ -9,7 +9,7 @@ int main()
 	int cameraId = 0;
 	
 	//Obtain a camera enumerator using default backend
-    std::shared_ptr<CameraEnumerator> camEnum = getCameraEnumerator();//CaptureBackend::DepthAI);
+    std::shared_ptr<CameraEnumerator> camEnum = getCameraEnumerator(CaptureBackend::GStreamer);
     camEnum->detectCameras();
     printf("%d cameras detected\n", camEnum->count());
     for(int i = 0; i < camEnum->count(); i++) {
@@ -45,6 +45,7 @@ int main()
         converter.convertImage(imgData, imgData2);
         //Create OpenCV Mat for visualization
         cv::Mat resultImg2(imgData2->getImageFormat().height, imgData2->getImageFormat().width, CV_8UC3, imgData2->getDataPtr());
+        //cv::Mat resultImg2(imgData->getImageFormat().height, imgData->getImageFormat().width, CV_8UC1, imgData->getDataPtr());
         cv::imshow("img", resultImg2);
         if(cv::waitKey(10) > 0)
             break;
