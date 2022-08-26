@@ -71,7 +71,7 @@ bool CameraInterfaceDShow::open(const char *params)
         listFormatsFourcc.clear();
         for(videoFormat &format : listNativeFormats) {
             ImageFormat resultFormat;
-            resultFormat.type = toImageType(format.format);
+            resultFormat.type = toImageType(format.format.c_str());
             resultFormat.width = format.width;
             resultFormat.height = format.height;
             if(resultFormat.type != ImageType::UNKNOWN) {
