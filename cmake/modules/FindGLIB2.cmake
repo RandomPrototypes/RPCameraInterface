@@ -49,7 +49,6 @@ find_package_handle_standard_args(GLIB2  DEFAULT_MSG  GLIB2_LIBRARIES GLIB2_MAIN
 
 mark_as_advanced(GLIB2_INCLUDE_DIR GLIB2_LIBRARIES)
 
-
 find_program(GLIB2_GENMARSHAL_UTIL glib-genmarshal)
 
 macro(glib2_genmarshal output_name)

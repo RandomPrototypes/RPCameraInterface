@@ -9,12 +9,16 @@ int main()
 	int cameraId = 0;
 	
 	//Obtain a camera enumerator using default backend
-    std::shared_ptr<CameraEnumerator> camEnum = getCameraEnumerator(CaptureBackend::GStreamer);
+    std::shared_ptr<CameraEnumerator> camEnum = getCameraEnumerator();//CaptureBackend::GStreamer
     camEnum->detectCameras();
     printf("%s, %d cameras detected\n", camEnum->getCameraType(), camEnum->count());
     for(int i = 0; i < camEnum->count(); i++) {
         printf("%s: %s\n", camEnum->getCameraId(i), camEnum->getCameraName(i));
     }
+
+    printf("which camera?\n");
+    if(camEnum->count() > 1)
+        scanf("%d", &cameraId);
     
     if(cameraId < 0 || cameraId >= camEnum->count())
     	return 0;

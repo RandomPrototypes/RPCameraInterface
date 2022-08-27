@@ -68,10 +68,22 @@ namespace RPCameraInterface
 bool gstreamer_config_call_deinit = false;
 bool gstreamer_config_start_loop = false;
 
+std::string escapeCameraPath(std::string path)
+{
+    std::string result;
+    for(size_t i = 0; i < path.size(); i++)
+    {
+        if(path[i] == '\\')
+            result += "\\\\";
+        else result += path[i];
+    }
+    return result;
+}
+
 std::string getGStreamerCameraSource()
 {
     #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-        return "ksvideosrc";
+        return "mfvideosrc";
     #elif __APPLE__
         return "avfvideosrc";
     #elif __linux__
@@ -140,7 +152,7 @@ private:
         gboolean gst_init_res = gst_init_check(NULL, NULL, err.getRef());
         if (!gst_init_res)
         {
-            //CV_WARN("Can't initialize GStreamer: " << (err ? err->message : "<unknown reason>"));
+            printf("Can't initialize GStreamer: %s\n", (err ? err->message : "<unknown reason>"));
             isFailed = true;
             return;
         }
@@ -148,7 +160,7 @@ private:
         gst_version(&major, &minor, &micro, &nano);
         if (GST_VERSION_MAJOR != major)
         {
-            //CV_WARN("incompatible GStreamer version");
+            printf("incompatible GStreamer version\n");
             isFailed = true;
             return;
         }
@@ -188,11 +200,46 @@ CameraEnumeratorGStreamer::~CameraEnumeratorGStreamer()
 {
 }
 
+static gboolean my_bus_func (GstBus * bus, GstMessage * message, gpointer user_data)
+{
+    GstDevice *device;
+    gchar *name;
+
+    switch (GST_MESSAGE_TYPE (message)) {
+    case GST_MESSAGE_DEVICE_ADDED:
+        gst_message_parse_device_added (message, &device);
+        name = gst_device_get_display_name (device);
+        g_print("Device added: %s\n", name);
+        g_free (name);
+        gst_object_unref (device);
+        break;
+    case GST_MESSAGE_DEVICE_REMOVED:
+        gst_message_parse_device_removed (message, &device);
+        name = gst_device_get_display_name (device);
+        g_print("Device removed: %s\n", name);
+        g_free (name);
+        gst_object_unref (device);
+        break;
+    default:
+        break;
+    }
+
+    return G_SOURCE_CONTINUE;
+}
+
 bool CameraEnumeratorGStreamer::detectCameras()
 {
     listCameras.clear();
 
     GstDeviceMonitor* monitor = gst_device_monitor_new();
+    /*GstBus *bus = gst_device_monitor_get_bus (monitor);
+    gst_bus_add_watch (bus, my_bus_func, NULL);
+    gst_object_unref (bus);
+
+    GstCaps *caps = gst_caps_new_empty_simple ("video/x-raw");
+    gst_device_monitor_add_filter (monitor, "Video/Source", caps);
+    gst_caps_unref (caps);*/
+
     if(!gst_device_monitor_start(monitor)){
         printf("WARNING: Monitor couldn't started!!\n");
     }
@@ -202,7 +249,7 @@ bool CameraEnumeratorGStreamer::detectCameras()
     for(size_t i = 0; i < g_list_length(devices); i++) {
         GstDevice *device = (GstDevice*)g_list_nth_data(devices, i);
         gchar *device_class = gst_device_get_device_class(device);
-        if (std::string(device_class) == "Video/Source") {
+        if (std::string(device_class) == "Video/Source" || std::string(device_class) == "Source/Video") {
             gchar *device_name = gst_device_get_display_name(device);
             GstStructure *properties = gst_device_get_properties(device);
             if (gst_structure_has_field(properties, "device.path")) {
@@ -243,7 +290,7 @@ GstDevice *getDeviceById(GList* devices, const char *id)
     for(size_t i = 0; i < g_list_length(devices); i++) {
         GstDevice *device = (GstDevice*)g_list_nth_data(devices, i);
         gchar *device_class = gst_device_get_device_class(device);
-        if (std::string(device_class) == "Video/Source") {
+        if (std::string(device_class) == "Video/Source" || std::string(device_class) == "Source/Video") {
             GstStructure *properties = gst_device_get_properties(device);
             if (gst_structure_has_field(properties, "device.path")) {
                 const gchar *path = gst_structure_get_string(properties, "device.path");
@@ -496,7 +543,12 @@ const char *CameraInterfaceGStreamer::getErrorMsg()
 bool CameraInterfaceGStreamer::startCapturing()
 {
     std::ostringstream desc;
-    desc << getGStreamerCameraSource() << " device=" << cameraId;
+    desc << getGStreamerCameraSource();
+    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+        desc << " device-path=\"" << escapeCameraPath(cameraId) << "\"";
+    #else
+        desc << " device=" << cameraId;
+    #endif
     if(imageFormat.type == ImageType::JPG) {
         desc << " ! image/jpeg";
     } else {
