@@ -96,16 +96,16 @@ RPCAM_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends()
     list.push_back(CaptureBackend::V4L2);
     #endif
 
-	list.push_back(CaptureBackend::RPNetworkCamera);
+    #ifdef USE_GSTREAMER
+    list.push_back(CaptureBackend::GStreamer);
+    #endif
 
     list.push_back(CaptureBackend::OpenCV);
 
+	list.push_back(CaptureBackend::RPNetworkCamera);
+
     #ifdef USE_DEPTHAI
     list.push_back(CaptureBackend::DepthAI);
-    #endif
-
-    #ifdef USE_GSTREAMER
-    list.push_back(CaptureBackend::GStreamer);
     #endif
 
     return list;

@@ -367,9 +367,6 @@ bool CameraInterfaceGStreamer::isPipelinePlaying()
 
 ImageData *CameraInterfaceGStreamer::getNewFramePtr(bool skipOldFrames)
 {
-    if (!pipeline || !GST_IS_ELEMENT(pipeline.get()))
-        return NULL;
-
     // start the pipeline if it was not in playing state yet
     if (!isPipelinePlaying()) {
       //  this->startPipeline();
@@ -377,12 +374,18 @@ ImageData *CameraInterfaceGStreamer::getNewFramePtr(bool skipOldFrames)
     }
 
     // bail out if EOS
-    if (gst_app_sink_is_eos(GST_APP_SINK(sink.get())))
+    if (gst_app_sink_is_eos(GST_APP_SINK(sink.get()))) {
+        errorMsg.clear();
+        errorMsg << "GStreamer: app sink is eos\n";
         return NULL;
+    }
 
     sample.attach(gst_app_sink_pull_sample(GST_APP_SINK(sink.get())));
-    if (!sample)
+    if (!sample) {
+        errorMsg.clear();
+        errorMsg << "GStreamer: can not gst_app_sink_pull_sample\n";
         return NULL;
+    }
 
     //if (isPosFramesEmulated)
       //  emulatedFrameNumber++;
