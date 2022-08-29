@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project (RPCameraInterface VERSION 0.1)
+project (RPCameraInterface VERSION 1.2)
 set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_DEBUG_POSTFIX "d")
@@ -221,6 +221,11 @@ install(TARGETS RPCameraInterface  EXPORT rpcamerainterface-config
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR})
 #install(TARGETS RPCameraInterface DESTINATION lib/ EXPORT rpcamerainterface-config)
+
+if(BUILD_DEMO)
+   install(TARGETS RPCameraInterfaceDemo RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
+
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include DESTINATION . PATTERN "*.h")	
 install(EXPORT rpcamerainterface-config DESTINATION lib/cmake/RPCameraInterface)

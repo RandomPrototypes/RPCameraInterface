@@ -13,8 +13,11 @@ int main()
     camEnum->detectCameras();
     printf("%s, %d cameras detected\n", camEnum->getCameraType(), camEnum->count());
     for(int i = 0; i < camEnum->count(); i++) {
-        printf("%s: %s\n", camEnum->getCameraId(i), camEnum->getCameraName(i));
+        printf("%d : %s: %s\n", i, camEnum->getCameraId(i), camEnum->getCameraName(i));
     }
+
+    if(camEnum->count() == 0)
+        return 0;
 
     printf("which camera?\n");
     if(camEnum->count() > 1)
