@@ -207,7 +207,7 @@ if(${USE_OPENCV})
 endif()
 
 if(USE_DEPTHAI)
-	target_link_libraries(RPCameraInterface PRIVATE depthai::opencv)
+	target_link_libraries(RPCameraInterface PUBLIC depthai::opencv)
 endif()
 
 if(BUILD_DEMO)
