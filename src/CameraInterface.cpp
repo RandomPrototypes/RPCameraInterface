@@ -112,7 +112,6 @@ RPCAM_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends()
 }
 RPCAM_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend backend)
 {
-    printf("getCameraEnumerator %d\n", (int)backend);
 	if(backend == CaptureBackend::Any) {
 		std::vector<CaptureBackend> list = getAvailableCaptureBackends();
 		if(list.size() > 0)

@@ -403,6 +403,9 @@ bool VideoEncoderImpl::open(const char *filename, int height, int width, int fps
 
     AVDictionary *opt = NULL;
 
+    if(preset != NULL && strlen(preset) > 0)
+        av_dict_set(&opt, "preset", preset, 0);
+
     int ret;
 
     avformat_alloc_output_context2(&oc, NULL, NULL, filename);

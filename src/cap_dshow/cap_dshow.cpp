@@ -3125,7 +3125,7 @@ std::vector<videoFormat> videoInput::getVideoFormats(int deviceID)
             char guidStr[8];
             getMediaSubtypeAsString(mediaType->subtype, guidStr);
             int fourcc = getFourccFromMediaSubtype(mediaType->subtype);
-            printf("%d x %d (%s)\n", width, height, guidStr);
+            //printf("%d x %d (%s)\n", width, height, guidStr);
             listFormats.push_back(videoFormat(guidStr, fourcc, width, height));
         }
         MyFreeMediaType(*mediaType);

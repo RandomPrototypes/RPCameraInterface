@@ -147,6 +147,7 @@ bool CameraInterfaceDShow::startCapturing()
     }
     if(!found)
         return false;
+    g_VI.setIdealFramerate(cameraId, 30);
     g_VI.setupDeviceFourcc(cameraId, imageFormat.width, imageFormat.height, fourcc);
 
     return g_VI.isDeviceSetup(cameraId);
