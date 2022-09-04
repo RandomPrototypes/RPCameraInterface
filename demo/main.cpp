@@ -65,34 +65,41 @@ int main()
     for(size_t i = 0; i < listBackends.size(); i++)
         printf("%d : %s\n", (int)i, getCameraEnumerator(listBackends[i])->getCameraType());
     scanf("%d", &backendId);
+    getchar();
     
     if(backendId < 0 || backendId >= listBackends.size())
     	return 0;
     
-    
-	//Obtain a camera enumerator using default backend
-    std::shared_ptr<CameraEnumerator> camEnum = getCameraEnumerator(listBackends[backendId]);//CaptureBackend::GStreamer
-    camEnum->detectCameras();
-    printf("%s, %d cameras detected\n", camEnum->getCameraType(), camEnum->count());
-    for(int i = 0; i < camEnum->count(); i++) {
-        printf("%d : %s: %s\n", i, camEnum->getCameraId(i), camEnum->getCameraName(i));
+    std::string cameraParam;
+    if(listBackends[backendId] == CaptureBackend::OpenCV) {
+        printf("enter camera parameter:\n");
+        std::getline(std::cin, cameraParam);
+    } else {
+        //Obtain a camera enumerator using default backend
+        std::shared_ptr<CameraEnumerator> camEnum = getCameraEnumerator(listBackends[backendId]);//CaptureBackend::GStreamer
+        camEnum->detectCameras();
+        printf("%s, %d cameras detected\n", camEnum->getCameraType(), camEnum->count());
+        for(int i = 0; i < camEnum->count(); i++) {
+            printf("%d : %s: %s\n", i, camEnum->getCameraId(i), camEnum->getCameraName(i));
+        }
+
+        if(camEnum->count() == 0)
+            return 0;
+
+        printf("which camera?\n");
+        if(camEnum->count() > 1)
+            scanf("%d", &cameraId);
+        
+        if(cameraId < 0 || cameraId >= camEnum->count())
+            return 0;
+        cameraParam = camEnum->getCameraId(cameraId);
     }
 
-    if(camEnum->count() == 0)
-        return 0;
-
-    printf("which camera?\n");
-    if(camEnum->count() > 1)
-        scanf("%d", &cameraId);
-    
-    if(cameraId < 0 || cameraId >= camEnum->count())
-    	return 0;
-
 	//Obtain a camera interface using the same backend as the enumerator
-    std::shared_ptr<CameraInterface> cam = getCameraInterface(camEnum->getBackend());
+    std::shared_ptr<CameraInterface> cam = getCameraInterface(listBackends[backendId]);
     //Open the camera using the id from the enumerator
-    if(!cam->open(camEnum->getCameraId(cameraId))) {
-        printf("error in cam->open(\"%s\") : %s\n", camEnum->getCameraId(cameraId), cam->getErrorMsg());
+    if(!cam->open(cameraParam.c_str())) {
+        printf("error in cam->open(\"%s\") : %s\n", cameraParam.c_str(), cam->getErrorMsg());
         return 0;
     }
     //Get the list of available formats
