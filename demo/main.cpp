@@ -5,56 +5,6 @@
 
 using namespace RPCameraInterface;
 
-std::vector<ImageFormat> getListResolution(const std::vector<ImageFormat>& listFormats, ImageType type_filter = ImageType::UNKNOWN)
-{
-    std::vector<ImageFormat> result = listFormats;
-    if(type_filter != ImageType::UNKNOWN) {
-        for(int i = 0; i < static_cast<int>(result.size()); i++) {
-            if(result[i].type != type_filter) {
-                result.erase(result.begin() + i);
-                i--;
-            }
-        }
-    }
-    std::sort(result.begin(), result.end(), [](const ImageFormat& A, const ImageFormat& B)
-        {
-            return A.width > B.width || (A.width == B.width && A.height > B.height);
-        });
-    for(size_t i = 1; i < result.size(); i++) {
-        if(result[i].width == result[i-1].width && result[i].height == result[i-1].height) {
-            result.erase(result.begin() + i);
-            i--;
-        } else {
-            result[i].type = ImageType::UNKNOWN;
-            result[i].fps = 0;
-        }
-    }
-    return result;
-}
-
-std::vector<ImageType> getListImageType(const std::vector<ImageFormat>& listFormats, int filter_width = -1, int filter_height = -1)
-{
-    std::vector<ImageFormat> list = listFormats;
-    if(filter_width > 0 || filter_height > 0) {
-        for(int i = 0; i < (int)list.size(); i++) {
-            if((filter_width <= 0 && list[i].width != filter_width) || (filter_height <= 0 && list[i].height != filter_height)) {
-                list.erase(list.begin() + i);
-                i--;
-            }
-        }
-    }
-    std::sort(list.begin(), list.end(), [](const ImageFormat& A, const ImageFormat& B)
-        {
-            return static_cast<int>(A.type) < static_cast<int>(B.type);
-        });
-    std::vector<ImageType> result;
-    for(size_t i = 0; i < list.size(); i++) {
-        if(result.size() == 0 || result[result.size()-1] != list[i].type)
-            result.push_back(list[i].type);
-    }
-    return result;
-}
-
 int main()
 {
 	int backendId = 0, cameraId = 0;
@@ -102,6 +52,7 @@ int main()
         printf("error in cam->open(\"%s\") : %s\n", cameraParam.c_str(), cam->getErrorMsg());
         return 0;
     }
+    printf("querying the available formats...\n");
     //Get the list of available formats
     std::vector<ImageFormat> listFormats = cam->getListAvailableFormat();
     std::vector<ImageFormat> listResolutions = getListResolution(listFormats);

@@ -112,12 +112,15 @@ bool CameraInterfaceOpenCV::open(const char *params)
             int longest_match = 0;
             for(auto& backend : listBackends) {
                 if(str.rfind(backend.first, 0) == 0 && backend.first.size() > longest_match) {
+                    printf("found backend: %s\n", backend.first.c_str());
                     capture_backend = backend.second;
                     longest_match = backend.first.size();
                 }
             }
-            if(longest_match == 0)
+            if(longest_match == 0) {
+                printf("could not find backend: %s\n", str.c_str());
                 return false;
+            }
             str.erase(str.begin(), str.begin()+longest_match);
             ltrim(str);
             if(str[0] == ';')
@@ -144,6 +147,7 @@ bool CameraInterfaceOpenCV::open(const char *params)
                     str.erase(str.begin(), str.begin()+1);
                 }
             }
+            printf("resolution: %dx%d\n", resolution[0], resolution[1]);
             if(str[0] == ';')
                 str.erase(str.begin(), str.begin()+1);
             ltrim(str);
@@ -151,21 +155,30 @@ bool CameraInterfaceOpenCV::open(const char *params)
         try
         {
             int id = std::stoi(str.c_str());
+            printf("device id: %d\n", id);
             cap = new cv::VideoCapture(id, capture_backend);
         } catch(std::invalid_argument& ia2) {
+            printf("device: %s\n", str.c_str());
             cap = new cv::VideoCapture(str.c_str(), capture_backend);
         } catch(const std::exception& e) {
+            printf("could not open camera: %s\n", e.what());
             return false;
         }
-        if(resolution[0] != 0)
+        if(resolution[0] != 0) {
+            printf("try set camera width to %d\n", resolution[0]);
             cap->set(cv::CAP_PROP_FRAME_WIDTH, resolution[0]);
-        if(resolution[1] != 0)
+        }
+        if(resolution[1] != 0) {
+            printf("try set camera height to %d\n", resolution[1]);
             cap->set(cv::CAP_PROP_FRAME_HEIGHT, resolution[1]);
+        }
     } catch(const std::exception& e) {
+        printf("exception: %s\n", e.what());
         return false;
     }
     
     if(!cap->isOpened()) {
+        printf("cap is not open...\n");
         delete cap;
         cap = NULL;
         return false;
@@ -175,6 +188,7 @@ bool CameraInterfaceOpenCV::open(const char *params)
     mjpg_fourcc = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');//0x47504A4D;
     imageFormat.width = cvRound(cap->get(cv::CAP_PROP_FRAME_WIDTH));
     imageFormat.height = cvRound(cap->get(cv::CAP_PROP_FRAME_HEIGHT));
+    printf("camera size is %dx%d\n", imageFormat.width, imageFormat.height);
     imageFormat.type = ImageType::BGR24;
     return true;
 }
@@ -284,14 +298,17 @@ const char *CameraInterfaceOpenCV::getErrorMsg()
 
 bool CameraInterfaceOpenCV::startCapturing()
 {
+    printf("startCapturing...\n");
     if(cap != NULL) {
         /*if(imageFormat.type == ImageType::JPG) {
             cap->set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('m', 'j', 'p', 'g'));
             cap->set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
         } else*/ {
+            printf("set fourcc %d\n", default_fourcc);
             cap->set(cv::CAP_PROP_FOURCC, default_fourcc);
         }
         //cap->set(cv::CAP_PROP_FOURCC, imageFormat.type == ImageType::MJPG ? mjpg_fourcc : default_fourcc);
+        printf("set resolution %dx%d\n", imageFormat.width, imageFormat.height);
         cap->set(cv::CAP_PROP_FRAME_WIDTH, imageFormat.width);
         cap->set(cv::CAP_PROP_FRAME_HEIGHT, imageFormat.height);
     }

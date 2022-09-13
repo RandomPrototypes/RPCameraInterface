@@ -104,6 +104,8 @@ protected:
 RPCAM_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends();
 RPCAM_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend backend = CaptureBackend::Any);
 RPCAM_EXPORTS std::shared_ptr<CameraInterface> getCameraInterface(CaptureBackend backend = CaptureBackend::Any);
+RPCAM_EXPORTS std::vector<ImageFormat> getListResolution(const std::vector<ImageFormat>& listFormats, ImageType type_filter = ImageType::UNKNOWN);
+RPCAM_EXPORTS std::vector<ImageType> getListImageType(const std::vector<ImageFormat>& listFormats, int filter_width = -1, int filter_height = -1);
 
 
 
