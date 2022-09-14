@@ -226,7 +226,7 @@ RPCAM_EXPORTS std::vector<ImageType> getListImageType(const std::vector<ImageFor
     std::vector<ImageFormat> list = listFormats;
     if(filter_width > 0 || filter_height > 0) {
         for(int i = 0; i < (int)list.size(); i++) {
-            if((filter_width <= 0 && list[i].width != filter_width) || (filter_height <= 0 && list[i].height != filter_height)) {
+            if((filter_width >= 0 && list[i].width != filter_width) || (filter_height >= 0 && list[i].height != filter_height)) {
                 list.erase(list.begin() + i);
                 i--;
             }
