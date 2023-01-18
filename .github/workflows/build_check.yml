@@ -41,7 +41,8 @@ jobs:
     - name: Install libav, gstreamer and OpenCV
       if: runner.os == 'Linux'
       run: |
-        sudo apt update
+        sudo apt -y update
+        sudo apt -y install libunwind-dev
         sudo apt -y install pkg-config 
         sudo apt -y install libavcodec-dev libavformat-dev libswscale-dev libavdevice-dev libavfilter-dev
         sudo apt -y install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
