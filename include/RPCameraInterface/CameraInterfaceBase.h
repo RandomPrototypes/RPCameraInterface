@@ -72,6 +72,7 @@ public:
     virtual bool startCapturing() = 0;
     virtual bool stopCapturing() = 0;
     virtual bool hasRecordingCapability();
+    virtual bool hasROICapability();
     virtual bool startRecording();
     virtual bool stopRecordingAndSaveToFile(const char *videoFilename, const char *timestampFilename);
     virtual void selectFormat(int formatId);
@@ -80,6 +81,8 @@ public:
     virtual void selectFormat(ImageFormat format);
     virtual void selectVideoContainer(VideoContainerType container);
     virtual void selectVideoCodec(VideoCodecType codec);
+    virtual bool setROI(int x, int y, int width, int height);
+    virtual void getROI(int *x, int *y, int *width, int *height) const;
     virtual const char *getErrorMsg();
     virtual CaptureBackend getBackend();
 

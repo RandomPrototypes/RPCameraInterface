@@ -146,8 +146,9 @@ int main()
             printf("error in cam->getNewFrame : %s\n", cam->getErrorMsg());
             break;
         }
+
         auto t1 = std::chrono::system_clock::now();
-        //Conver to the output format (BGR 720x480)
+        //Convert to the output format (BGR 720x480)
         converter.convertImage(imgData, imgData2);
         auto t2 = std::chrono::system_clock::now();
         if(videoEncoder != NULL) {

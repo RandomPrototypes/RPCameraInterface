@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project (RPCameraInterface VERSION 1.2)
+project (RPCameraInterfaceDemo VERSION 1.2)
 set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_DEBUG_POSTFIX "d")

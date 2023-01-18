@@ -23,6 +23,10 @@
 #include "RPCameraInterface/CameraInterfaceGStreamer.h"
 #endif
 
+#ifdef USE_SCREEN_CAPTURE_LITE
+#include "RPCameraInterface/CameraInterfaceScreenCaptureLite.h"
+#endif
+
 namespace RPCameraInterface
 {
 
@@ -108,6 +112,10 @@ RPCAM_EXPORTS std::vector<CaptureBackend> getAvailableCaptureBackends()
     list.push_back(CaptureBackend::DepthAI);
     #endif
 
+    #ifdef USE_SCREEN_CAPTURE_LITE
+    list.push_back(CaptureBackend::ScreenCaptureLite);
+    #endif
+
     return list;
 }
 RPCAM_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBackend backend)
@@ -144,6 +152,11 @@ RPCAM_EXPORTS std::shared_ptr<CameraEnumerator> getCameraEnumerator(CaptureBacke
         case CaptureBackend::GStreamer:
             printf("capture backend gstreamer\n");
             return std::make_shared<CameraEnumeratorGStreamer>();
+        #endif
+
+        #ifdef USE_SCREEN_CAPTURE_LITE
+        case CaptureBackend::ScreenCaptureLite:
+            return std::make_shared<CameraEnumeratorScreenCaptureLite>();
         #endif
 
         default:
@@ -185,6 +198,11 @@ RPCAM_EXPORTS std::shared_ptr<CameraInterface> getCameraInterface(CaptureBackend
         #ifdef USE_GSTREAMER
         case CaptureBackend::GStreamer:
             return std::make_shared<CameraInterfaceGStreamer>();
+        #endif
+
+        #ifdef USE_SCREEN_CAPTURE_LITE
+        case CaptureBackend::ScreenCaptureLite:
+            return std::make_shared<CameraInterfaceScreenCaptureLite>();
         #endif
 
         default:

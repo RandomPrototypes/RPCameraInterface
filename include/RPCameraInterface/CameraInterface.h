@@ -22,7 +22,8 @@ enum class CaptureBackend
     LibWebcam,
     OpenCV,
     GStreamer,
-    DepthAI
+    DepthAI,
+    ScreenCaptureLite,
 };
 
 class RPCAM_EXPORTS CameraEnumeratorField
@@ -75,6 +76,7 @@ public:
     virtual bool startCapturing() = 0;
     virtual bool stopCapturing() = 0;
     virtual bool hasRecordingCapability() = 0;
+    virtual bool hasROICapability() = 0;
     virtual bool startRecording() = 0;
     virtual bool stopRecordingAndSaveToFile(const char *videoFilename, const char *timestampFilename) = 0;
     virtual void selectFormat(int formatId) = 0;
@@ -83,6 +85,8 @@ public:
     virtual void selectFormat(ImageFormat format) = 0;
     virtual void selectVideoContainer(VideoContainerType container) = 0;
     virtual void selectVideoCodec(VideoCodecType codec) = 0;
+    virtual bool setROI(int x, int y, int width, int height) = 0;
+    virtual void getROI(int *x, int *y, int *width, int *height) const = 0;
     virtual const char *getErrorMsg() = 0;
     virtual CaptureBackend getBackend() = 0;
     

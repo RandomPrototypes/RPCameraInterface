@@ -112,7 +112,23 @@ void CameraInterfaceBase::selectVideoCodec(VideoCodecType codec)
 
 }
 
+bool CameraInterfaceBase::setROI(int x, int y, int width, int height)
+{
+    return false;
+}
+void CameraInterfaceBase::getROI(int *x, int *y, int *width, int *height) const
+{
+    *x = 0;
+    *y = 0;
+    *width = 0;
+    *height = 0;
+}
+
 bool CameraInterfaceBase::hasRecordingCapability()
+{
+    return false;
+}
+bool CameraInterfaceBase::hasROICapability()
 {
     return false;
 }

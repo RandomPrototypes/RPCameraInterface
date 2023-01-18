@@ -18,6 +18,7 @@ option(USE_QT "Use QT" OFF)
 option(USE_OPENCV "Use OpenCV" ON)
 option(USE_GSTREAMER "Use GStreamer" ON)
 option(USE_DEPTHAI "Use DepthAI" OFF)
+option(USE_SCREEN_CAPTURE_LITE "Use Screen capture lite" OFF)
 option(BUILD_DEMO "Build DEMO" OFF)
 
 set(EXTERNAL_INSTALL_LOCATION deps)
@@ -117,9 +118,17 @@ if(${USE_OPENCV} OR ${BUILD_DEMO})
 		find_package(OpenCV REQUIRED highgui)
 	endif()
 endif()
+
 if(${USE_OPENCV})
     set(LIB_SRC ${LIB_SRC} src/CameraInterfaceOpenCV.cpp)
     set(LIB_INCLUDE ${LIB_INCLUDE} include/RPCameraInterface/CameraInterfaceOpenCV.h)
+endif()
+
+if(${USE_SCREEN_CAPTURE_LITE})
+    set(LIB_SRC ${LIB_SRC} src/CameraInterfaceScreenCaptureLite.cpp)
+    set(LIB_INCLUDE ${LIB_INCLUDE} include/RPCameraInterface/CameraInterfaceScreenCaptureLite.h)
+	find_package(screen_capture_lite_shared REQUIRED)
+	include_directories(${screen_capture_lite_shared_INCLUDE_DIRS})
 endif()
 
 if(HAVE_DSHOW)
@@ -182,6 +191,10 @@ if(USE_GSTREAMER)
 	target_compile_definitions(RPCameraInterface PUBLIC "USE_GSTREAMER")
 endif()
 
+if(USE_SCREEN_CAPTURE_LITE)
+	target_compile_definitions(RPCameraInterface PUBLIC "USE_SCREEN_CAPTURE_LITE")
+endif()
+
 if(WIN32)
    if(MSVC)
       target_link_libraries(RPCameraInterface PRIVATE avdevice avfilter avformat avcodec swresample swscale avutil)
@@ -208,6 +221,10 @@ endif()
 
 if(USE_DEPTHAI)
 	target_link_libraries(RPCameraInterface PUBLIC depthai::opencv)
+endif()
+
+if(USE_SCREEN_CAPTURE_LITE)
+	target_link_libraries(RPCameraInterface PUBLIC ${screen_capture_lite_shared_LIBS})
 endif()
 
 if(BUILD_DEMO)
